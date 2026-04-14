@@ -1,0 +1,47 @@
+# A2 DocIntel Working Memory
+
+## Project Identity
+- Project: `A2 DocIntel - Production RAG with RAGAS Eval, Hybrid Search & Drift Monitoring`
+- Product shape: FastAPI service + Streamlit ops dashboard for hybrid retrieval, citation-grounded RAG, RAGAS-gated CI, and Evidently drift monitoring over the EU AI Act PDF
+- Repo mode: flagship, production-grade, phase-wise delivery
+- Active branch: `main`
+
+## Current Commands
+- `docker compose up -d`
+- `uv run --directory apps/api alembic upgrade head`
+- `uv run --directory apps/api pytest`
+- `uv run --directory apps/api uvicorn docintel.main:app --reload --app-dir src`
+- `uv run --directory apps/api python -m docintel.tools.ingest_eu_ai_act --path <pdf>`
+- `uv run --directory apps/api python -m docintel.tools.run_eval`
+- `uv run --directory apps/api python -m docintel.tools.run_drift`
+
+## Active Decisions
+- Modular monolith FastAPI + Postgres + pgvector + Streamlit dashboard
+- Embeddings: `BAAI/bge-small-en-v1.5` (384-dim); reranker: `cross-encoder/ms-marco-MiniLM-L-6-v2`
+- BM25 via Postgres `tsvector` + GIN; vector via pgvector HNSW (cosine)
+- Fusion: Reciprocal Rank Fusion (`k=60`)
+- LLM: OpenRouter; default generation `anthropic/claude-haiku-4-5`, judge `openai/gpt-4o-mini`
+- Eval: RAGAS faithfulness/context_precision/context_recall/answer_relevancy with CI gate
+- Drift: Evidently weekly job via APScheduler
+
+## Current Execution Truth
+- Blueprint: complete (`BLUEPRINT.md`)
+- Phase 1 foundation: complete
+- Verified on 2026-04-14:
+  - `uv sync`
+  - `uv run alembic upgrade head`
+  - `uv run pytest tests/test_health.py -v`
+  - `docker compose up -d`
+  - in-container `GET /api/v1/health/liveness`
+  - in-container `GET /api/v1/health/readiness`
+- Docker Desktop storage now lives on `D:\DockerData\wsl` and `D:\DockerData\vm-data`
+- Host-side `localhost:8000` access from Windows remained unreliable after Docker recovery even while the container served healthy responses internally
+- Per user direction on 2026-04-14, Docker host-port verification is no longer a phase-by-phase gate and will be revisited during final deployment/hardening
+
+## Update Rule
+Update this file after each verified phase closure together with:
+- `docs/HANDOFF.md`
+- `docs/PROGRESS.md`
+- `docs/DECISIONS.md`
+- `docs/architecture.md`
+- `docs/verification.md`

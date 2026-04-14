@@ -1,0 +1,49 @@
+[build-system]
+requires = ["hatchling>=1.27.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "docintel-api"
+version = "0.1.0"
+description = "DocIntel FastAPI service"
+readme = "README.md"
+requires-python = "==3.12.*"
+dependencies = [
+  "fastapi==0.135.2",
+  "uvicorn[standard]==0.42.0",
+  "sqlalchemy==2.0.48",
+  "alembic==1.18.4",
+  "asyncpg==0.31.0",
+  "aiosqlite==0.21.0",
+  "pgvector==0.4.1",
+  "pydantic==2.11.9",
+  "pydantic-settings==2.10.1",
+  "python-multipart==0.0.20",
+  "httpx==0.28.1",
+  "pypdf==5.4.0",
+  "sentence-transformers==3.4.1",
+  "torch==2.6.0",
+  "numpy==1.26.4",
+  "langchain==0.3.27",
+  "langchain-openai==0.3.13",
+  "langsmith==0.3.45",
+  "ragas==0.3.5",
+  "evidently==0.6.7",
+  "apscheduler==3.11.0",
+  "prometheus-client==0.23.1",
+  "structlog==25.4.0",
+  "pyjwt==2.10.1",
+  "python-dotenv==1.1.0",
+  "pytest==8.4.2",
+  "pytest-asyncio==1.0.0",
+  "pytest-cov==6.0.0",
+  "ruff==0.15.7",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/docintel"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+pythonpath = ["src"]

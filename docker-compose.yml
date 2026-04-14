@@ -1,0 +1,48 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: docintel-db
+    environment:
+      POSTGRES_DB: docintel
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./ops/docker/postgres-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d docintel"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: docintel-api
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/docintel
+      API_PORT: "8000"
+      DEBUG: "true"
+      LOG_LEVEL: INFO
+      LOG_FORMAT: console
+      API_KEYS: dev-key-change-me
+      SECRET_KEY: dev-secret-not-for-production
+      MODEL_CACHE_DIR: /app/.model_cache
+      ARTIFACT_STORAGE_PATH: /app/artifacts
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./artifacts:/app/artifacts
+      - model_cache:/app/.model_cache
+
+volumes:
+  postgres_data:
+  model_cache:
+
