@@ -32,6 +32,7 @@ This repository answers those questions with one modular monolith:
 | Dashboard quality gates | mypy clean, `3` dashboard DB-helper tests passing, Streamlit page smoke renders passing |
 | Observability | Root `GET /metrics` implemented and verified in-process |
 | Drift | Persisted drift report `53df52b6-07e9-49b8-8b6a-a213c35e9a37` with HTML artifact output |
+| GitHub Actions | `ci.yml` passed on GitHub run `24394769593` |
 | Compose validation | `docker compose -f docker-compose.yml -f docker-compose.prod.yml config` passes |
 | Final live blockers | Repo has no GitHub secrets configured; `OPENROUTER_API_KEY` is still required for live `/answer`, live eval, and the `ragas-eval` workflow |
 
@@ -189,6 +190,7 @@ In short:
 These are the remaining non-code blockers as of 2026-04-14:
 
 - `OPENROUTER_API_KEY` is not configured in the GitHub repo secrets, so the live `ragas-eval` workflow cannot succeed yet
+- `ragas-eval.yml` was dispatched and failed fast on the explicit secret preflight in GitHub run `24393783852`
 - GitHub repo secret inventory is currently empty from the authenticated CLI view
 - local Docker Desktop can bring up `db` and `api`, but the dashboard image export/build path is still slow and unreliable on this Windows host even after Dockerfile and build-context optimizations
 - live OpenRouter-backed `/api/v1/answer` and full end-to-end eval verification remain deferred until that secret is provided

@@ -7,27 +7,32 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /app
 
 RUN pip install --no-cache-dir uv==0.5.21
-COPY apps/api/pyproject.toml apps/api/uv.lock apps/api/README.md ./
+COPY pyproject.toml uv.lock README.md ./
 RUN uv sync --frozen --no-dev --no-install-project
 
-COPY apps/api/src ./src
-COPY apps/api/alembic ./alembic
-COPY apps/api/alembic.ini ./alembic.ini
+COPY src ./src
+COPY alembic ./alembic
+COPY alembic.ini ./alembic.ini
 RUN uv sync --frozen --no-dev
 
 FROM python:3.12-slim AS runtime
 
-RUN useradd --create-home --shell /bin/bash app
+RUN apt-get update \
+    && apt-get install --yes --no-install-recommends git \
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd --create-home --shell /bin/bash app
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
+    GIT_PYTHON_REFRESH=quiet \
     PATH="/app/.venv/bin:${PATH}" \
     PYTHONPATH=/app/src
 
 WORKDIR /app
 
 COPY --from=builder --chown=app:app /app /app
-RUN mkdir -p /app/.model_cache /app/artifacts
+RUN mkdir -p /app/.model_cache /app/artifacts \
+    && chown -R app:app /app
 
 USER app
 VOLUME ["/app/.model_cache", "/app/artifacts"]

@@ -7,10 +7,10 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /app
 
 RUN pip install --no-cache-dir uv==0.5.21
-COPY apps/dashboard/pyproject.toml apps/dashboard/uv.lock ./
+COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev --no-install-project
 
-COPY apps/dashboard/ ./
+COPY . ./
 RUN uv sync --frozen --no-dev
 
 FROM python:3.12-slim AS runtime
@@ -19,6 +19,7 @@ RUN useradd --create-home --shell /bin/bash app
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
+    STREAMLIT_BROWSER_GATHER_USAGE_STATS=false \
     PATH="/app/.venv/bin:$PATH"
 
 WORKDIR /app

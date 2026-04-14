@@ -7,11 +7,6 @@ from datetime import datetime, timezone
 from statistics import mean
 from typing import Protocol, cast
 
-from langchain_openai import ChatOpenAI
-from ragas import evaluate
-from ragas.dataset_schema import EvaluationDataset, EvaluationResult
-from ragas.llms import LangchainLLMWrapper
-from ragas.metrics import answer_relevancy, context_precision, context_recall, faithfulness
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from docintel.config import get_settings
@@ -64,6 +59,9 @@ class RagasJudgeScorer:
         if not settings.openrouter_api_key:
             raise LLMProviderNotConfiguredError("OPENROUTER_API_KEY is not configured")
 
+        from langchain_openai import ChatOpenAI
+        from ragas.llms import LangchainLLMWrapper
+
         chat_model = ChatOpenAI(
             model=judge_model,
             base_url=settings.openrouter_base_url,
@@ -81,6 +79,10 @@ class RagasJudgeScorer:
         generated_answer: str,
         contexts: list[str],
     ) -> EvalScores:
+        from ragas import evaluate
+        from ragas.dataset_schema import EvaluationDataset, EvaluationResult
+        from ragas.metrics import answer_relevancy, context_precision, context_recall, faithfulness
+
         dataset = EvaluationDataset.from_list(
             [
                 {

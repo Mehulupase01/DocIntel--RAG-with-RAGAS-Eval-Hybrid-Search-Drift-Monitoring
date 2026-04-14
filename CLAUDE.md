@@ -119,6 +119,8 @@
   - `docker compose -f docker-compose.yml -f docker-compose.prod.yml config`
 - Phase 9 blocker state:
   - `gh secret list` currently shows no configured repository secrets, so live `ragas-eval` verification still needs `OPENROUTER_API_KEY`
+  - `gh workflow run ci.yml --ref main` passed on GitHub run `24394769593`
+  - `gh workflow run ragas-eval.yml --ref main` failed fast on the explicit missing-secret preflight in GitHub run `24393783852`
   - local prod-overlay Docker bring-up reaches `db` and `api`, but the dashboard image export/build path remains unreliable on this Windows Docker Desktop host even after Dockerfile and `.dockerignore` hardening
 - Official AI Act verification ingest:
   - source URL: `https://op.europa.eu/o/opportal-service/download-handler?format=PDF&identifier=dc8116a1-3fe6-11ef-865a-01aa75ed71a1&language=en&productionSystem=cellar`

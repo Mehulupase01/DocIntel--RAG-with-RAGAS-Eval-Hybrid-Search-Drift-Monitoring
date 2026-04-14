@@ -224,5 +224,6 @@ gh workflow run ragas-eval.yml --ref main
   - `db`: healthy
   - `api`: up
   - `dashboard`: local image export/build remains unreliable on this Windows Docker Desktop host despite Dockerfile and `.dockerignore` hardening
+- `gh workflow run ci.yml --ref main`: Passed on GitHub run `24394769593`.
 - `gh secret list -R Mehulupase01/DocIntel--RAG-with-RAGAS-Eval-Hybrid-Search-Drift-Monitoring`: returned no configured repository secrets on 2026-04-14.
-- Because `OPENROUTER_API_KEY` is still absent at the repository level, live dispatch of `ragas-eval.yml` remains blocked until that secret is configured.
+- `gh workflow run ragas-eval.yml --ref main`: Failed on GitHub run `24393783852` at the explicit `Require OpenRouter secret` preflight step because `OPENROUTER_API_KEY` is still absent at the repository level.

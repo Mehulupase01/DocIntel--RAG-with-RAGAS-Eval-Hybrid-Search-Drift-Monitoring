@@ -27,8 +27,8 @@ services:
 
   dashboard:
     build:
-      context: .
-      dockerfile: apps/dashboard/Dockerfile
+      context: ./apps/dashboard
+      dockerfile: Dockerfile
     image: docintel-dashboard:0.1.0
     restart: unless-stopped
     ports:

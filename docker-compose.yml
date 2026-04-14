@@ -20,8 +20,8 @@ services:
 
   api:
     build:
-      context: .
-      dockerfile: apps/api/Dockerfile
+      context: ./apps/api
+      dockerfile: Dockerfile
     container_name: docintel-api
     depends_on:
       db:
@@ -45,4 +45,3 @@ services:
 volumes:
   postgres_data:
   model_cache:
-
