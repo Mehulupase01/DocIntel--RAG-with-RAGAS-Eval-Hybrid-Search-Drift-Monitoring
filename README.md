@@ -192,7 +192,8 @@ These are the remaining non-code blockers as of 2026-04-14:
 - `OPENROUTER_API_KEY` is not configured in the GitHub repo secrets, so the live `ragas-eval` workflow cannot succeed yet
 - `ragas-eval.yml` was dispatched and failed fast on the explicit secret preflight in GitHub run `24393783852`
 - GitHub repo secret inventory is currently empty from the authenticated CLI view
-- local Docker Desktop can bring up `db` and `api`, but the dashboard image export/build path is still slow and unreliable on this Windows host even after Dockerfile and build-context optimizations
+- `docker build -t docintel-dashboard:test apps/dashboard` now succeeds locally from the app-scoped build context
+- a fresh API image rebuild on this Windows Docker Desktop host still times out after 60 minutes even after the CPU-only torch pin and build-context reductions
 - live OpenRouter-backed `/api/v1/answer` and full end-to-end eval verification remain deferred until that secret is provided
 
 ## Docs

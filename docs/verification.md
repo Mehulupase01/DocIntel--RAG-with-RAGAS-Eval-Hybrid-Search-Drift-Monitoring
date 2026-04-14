@@ -216,14 +216,15 @@ gh workflow run ragas-eval.yml --ref main
 - `uvx --from ruff==0.15.7 ruff check apps/api/src apps/api/tests apps/dashboard`: Passed on 2026-04-14.
 - `uv run --directory apps/api --with mypy==1.18.2 mypy --config-file ../../mypy.ini src`: Passed on 2026-04-14.
 - `uv run --directory apps/dashboard --with mypy==1.18.2 mypy --config-file ../../mypy.ini app.py lib pages`: Passed on 2026-04-14.
+- `uv lock --directory apps/api`: Passed on 2026-04-14 and re-resolved `torch` to the CPU wheel (`2.6.0+cpu`) while removing the Linux CUDA/triton packages from `apps/api/uv.lock`.
+- `uv sync --directory apps/api`: Passed on 2026-04-14 after the lockfile hardening update.
 - `uv run --directory apps/api pytest tests -v`: Passed on 2026-04-14 (`33 passed`).
 - `uv run --directory apps/dashboard pytest tests/test_db_queries.py -v`: Passed on 2026-04-14 (`3 passed`).
 - `uv run --directory apps/dashboard python -m compileall app.py lib pages tests`: Passed on 2026-04-14.
+- `docker build -t docintel-dashboard:test apps/dashboard`: Passed on 2026-04-14 using the app-scoped build context and `.dockerignore`.
 - `docker compose -f docker-compose.yml -f docker-compose.prod.yml config`: Passed on 2026-04-14.
-- `docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d`: Partially verified on 2026-04-14.
-  - `db`: healthy
-  - `api`: up
-  - `dashboard`: local image export/build remains unreliable on this Windows Docker Desktop host despite Dockerfile and `.dockerignore` hardening
+- `docker build -t docintel-api:test apps/api`: Timed out on 2026-04-14 after 60 minutes on this Windows Docker Desktop host while rebuilding the fresh hardened API image.
+- `docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build`: Timed out on 2026-04-14 after 60 minutes on this Windows Docker Desktop host while waiting on the fresh API image rebuild.
 - `gh workflow run ci.yml --ref main`: Passed on GitHub run `24394769593`.
 - `gh secret list -R Mehulupase01/DocIntel--RAG-with-RAGAS-Eval-Hybrid-Search-Drift-Monitoring`: returned no configured repository secrets on 2026-04-14.
 - `gh workflow run ragas-eval.yml --ref main`: Failed on GitHub run `24393783852` at the explicit `Require OpenRouter secret` preflight step because `OPENROUTER_API_KEY` is still absent at the repository level.

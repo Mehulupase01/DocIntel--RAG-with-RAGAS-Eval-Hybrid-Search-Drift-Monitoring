@@ -77,6 +77,7 @@ The production overlay adds:
 - API containers write artifacts to `/app/artifacts`
 - dashboard containers do not need the embedding cache
 - GitHub Actions caches `apps/api/.model_cache` for the `ragas-eval` workflow
+- The API lockfile now pins `torch` to the explicit CPU wheel source, matching the blueprint's CPU-only inference assumption and avoiding bundled CUDA libraries in fresh installs
 
 ## GitHub Actions Secrets
 
@@ -101,8 +102,9 @@ To fully unlock live workflow verification, configure:
 ## Current Machine Caveats
 
 - `docker compose -f docker-compose.yml -f docker-compose.prod.yml config` is verified locally.
-- On this Windows Docker Desktop host, `db` and `api` come up, but the dashboard image build/export path remains unusually slow and unreliable even after Dockerfile and build-context optimizations.
-- The Dockerfiles are production-shaped and locally validated as far as Ruff, mypy, pytest, and Compose config are concerned, but a clean full-stack prod-overlay bring-up is still best re-verified on a Linux CI runner or after the local Docker Desktop export issue is resolved.
+- `docker build -t docintel-dashboard:test apps/dashboard` is verified locally from the app-scoped build context.
+- On this Windows Docker Desktop host, a fresh API image rebuild (`docker build apps/api` or `docker compose ... up -d --build`) still times out after 60 minutes even after the CPU-only torch pin, lazy RAGAS imports, and smaller build contexts.
+- The Dockerfiles are production-shaped and locally validated as far as Ruff, mypy, pytest, dashboard image build, and Compose config are concerned, but a clean full-stack prod-overlay bring-up is still best re-verified on a Linux CI runner or after the local Docker Desktop API image rebuild/export issue is resolved.
 
 ## Recommended Final Release Pass
 

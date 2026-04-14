@@ -51,4 +51,6 @@
 - Phase 9 runs mypy inside each project environment via `uv run --directory ... --with mypy==1.18.2 ...` instead of isolated `uvx mypy`, because isolated runs do not have project dependencies installed and produced false `import-not-found` failures.
 - Phase 9 hardens the dashboard Dockerfile to match the API pattern: sync dependencies before the project install, then copy the app and install the project package.
 - Phase 9 also switches both runtime images to `COPY --chown=app:app` so ownership is applied during the copy step instead of via a recursive `chown -R`, which is especially expensive on this Docker Desktop setup.
+- Phase 9 further aligns the packaging with the blueprint by pinning `torch` to the explicit PyTorch CPU wheel index. `uv lock --directory apps/api` now resolves `torch==2.6.0+cpu` and removes the unused CUDA/triton packages from fresh installs.
+- Phase 9 also defers `ragas` imports until eval execution time and installs `git` in the API runtime image. This keeps the main FastAPI app startup path from crashing on container boot while preserving the real RAGAS implementation for eval runs.
 - On 2026-04-14, `gh secret list` for `Mehulupase01/DocIntel--RAG-with-RAGAS-Eval-Hybrid-Search-Drift-Monitoring` returned no configured repository secrets. Live `ragas-eval` verification therefore remains blocked until `OPENROUTER_API_KEY` is added.

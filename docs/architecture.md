@@ -126,6 +126,8 @@
 ## Current Hardening State
 - Verified on 2026-04-14: Phase 9 hardening adds:
   - production-shaped API and dashboard Dockerfiles
+  - app-scoped Docker build contexts and per-app `.dockerignore` files
+  - a CPU-only `torch` resolution path for the API runtime
   - `docker-compose.prod.yml`
   - `.github/workflows/ci.yml`
   - a finalized `ragas-eval.yml` with model-cache support and an explicit secret preflight
@@ -136,7 +138,8 @@
   - mypy clean
   - full API test suite pass
   - dashboard test and compile pass
+  - dashboard image build pass
   - `docker compose -f docker-compose.yml -f docker-compose.prod.yml config` pass
 - Remaining final-live blockers:
   - GitHub repo secrets are currently absent, so the live OpenRouter-backed workflow gate is not yet runnable
-  - local Docker Desktop still struggles to fully export the dashboard image reliably under the prod overlay even after Dockerfile and build-context optimizations
+  - local Docker Desktop still times out on a fresh hardened API image rebuild under the prod overlay even after the CPU-only torch pin and build-context optimizations

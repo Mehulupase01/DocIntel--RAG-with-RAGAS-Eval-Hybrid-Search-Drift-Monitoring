@@ -110,18 +110,21 @@
   - Streamlit `AppTest` successfully rendered `app.py`, `1_Eval_Trends.py`, `2_Drift_Reports.py`, `3_Cost_and_Latency.py`, and `4_Retrieval_Explorer.py`
   - `ops/docker/compose.full.yml` validates cleanly and supplies the dashboard service on port `8501`
 - Phase 9 hardening verification:
+  - `uv lock --directory apps/api`
+  - `uv sync --directory apps/api`
   - `uvx --from ruff==0.15.7 ruff check apps/api/src apps/api/tests apps/dashboard`
   - `uv run --directory apps/api --with mypy==1.18.2 mypy --config-file ../../mypy.ini src`
   - `uv run --directory apps/dashboard --with mypy==1.18.2 mypy --config-file ../../mypy.ini app.py lib pages`
   - `uv run --directory apps/api pytest tests -v`
   - `uv run --directory apps/dashboard pytest tests/test_db_queries.py -v`
   - `uv run --directory apps/dashboard python -m compileall app.py lib pages tests`
+  - `docker build -t docintel-dashboard:test apps/dashboard`
   - `docker compose -f docker-compose.yml -f docker-compose.prod.yml config`
 - Phase 9 blocker state:
   - `gh secret list` currently shows no configured repository secrets, so live `ragas-eval` verification still needs `OPENROUTER_API_KEY`
   - `gh workflow run ci.yml --ref main` passed on GitHub run `24394769593`
   - `gh workflow run ragas-eval.yml --ref main` failed fast on the explicit missing-secret preflight in GitHub run `24393783852`
-  - local prod-overlay Docker bring-up reaches `db` and `api`, but the dashboard image export/build path remains unreliable on this Windows Docker Desktop host even after Dockerfile and `.dockerignore` hardening
+  - the dashboard image now rebuilds cleanly from the app-scoped Docker context, but a fresh API image rebuild (`docker build apps/api` or `docker compose ... up -d --build`) still timed out after 60 minutes on this Windows Docker Desktop host even after the CPU-only torch pin and Docker context reductions
 - Official AI Act verification ingest:
   - source URL: `https://op.europa.eu/o/opportal-service/download-handler?format=PDF&identifier=dc8116a1-3fe6-11ef-865a-01aa75ed71a1&language=en&productionSystem=cellar`
   - SHA256: `bba630444b3278e881066774002a1d7824308934f49ccfa203e65be43692f55e`
@@ -133,7 +136,7 @@
 - Per user direction on 2026-04-14, Docker host-port verification is no longer a phase-by-phase gate and will be revisited during final deployment/hardening
 - Per user direction on 2026-04-14, OpenRouter-backed live verification for `/api/v1/answer` and later eval flows is deferred to the final deployment/hardening gate; intermediate phase closure may proceed on passing local tests and stubbed provider integration checks
 - The local `docintel` database initially had current-window traffic but no prior 7-day reference traffic on 2026-04-14, so Phase 7 verification seeded deterministic historical query/retrieval windows in the local DB before running the one-shot drift CLI
-- Per the same execution policy, full Docker bring-up with the dashboard container is deferred to the final deployment/hardening pass; Phase 8 used `docker compose ... config`, dashboard tests, and Streamlit render smoke checks for intermediate closure
+- Per the same execution policy, full Docker bring-up with the dashboard container was deferred until Phase 9; the later hardening pass confirmed the dashboard image rebuilds cleanly from its app-scoped context, while a fresh API image rebuild remains the only local Docker bottleneck
 - The Phase 3 benchmark CLI seeds and then cleans up a deterministic fixture so retrieval benchmarking stays repeatable without polluting the live corpus
 
 ## Update Rule
