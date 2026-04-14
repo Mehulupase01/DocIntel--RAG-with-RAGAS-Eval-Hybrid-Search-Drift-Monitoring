@@ -12,6 +12,7 @@
 - `uv run --directory apps/api pytest`
 - `uv run --directory apps/api uvicorn docintel.main:app --reload --app-dir src`
 - `uv run --directory apps/api python -m docintel.tools.ingest_eu_ai_act --path <pdf>`
+- `uv run --directory apps/api python -m docintel.tools.benchmark_retrieval --top-k 10`
 - `uv run --directory apps/api python -m docintel.tools.run_eval`
 - `uv run --directory apps/api python -m docintel.tools.run_drift`
 
@@ -28,6 +29,7 @@
 - Blueprint: complete (`BLUEPRINT.md`)
 - Phase 1 foundation: complete
 - Phase 2 ingestion pipeline: complete
+- Phase 3 retrieval layer: complete
 - Verified on 2026-04-14:
   - `uv sync`
   - `uv run alembic upgrade head`
@@ -41,6 +43,16 @@
   - `uv run python -m docintel.tools.ingest_eu_ai_act --path <official-pdf> --source-uri <official-url>`
   - ASGI `GET /api/v1/documents`
   - ASGI `GET /api/v1/documents/{id}`
+- Verified on 2026-04-14 for Phase 3:
+  - `uv run alembic upgrade head`
+  - `uv run pytest tests/test_bm25.py tests/test_vector.py tests/test_fusion.py tests/test_reranker.py tests/test_search_endpoint.py -v`
+  - `uv run python -m docintel.tools.benchmark_retrieval --top-k 10`
+  - ASGI `POST /api/v1/search`
+- Phase 3 benchmark result on seeded fixture:
+  - `vector_only`: precision@10 `0.100`, recall@10 `0.500`
+  - `hybrid_reranked`: precision@10 `0.150`, recall@10 `0.750`
+- Phase 3 retrieval verification:
+  - `/api/v1/search` returned `200` against the real EU AI Act corpus and persisted `queries` plus ranked `retrievals`
 - Official AI Act verification ingest:
   - source URL: `https://op.europa.eu/o/opportal-service/download-handler?format=PDF&identifier=dc8116a1-3fe6-11ef-865a-01aa75ed71a1&language=en&productionSystem=cellar`
   - SHA256: `bba630444b3278e881066774002a1d7824308934f49ccfa203e65be43692f55e`
@@ -50,6 +62,7 @@
 - Docker Desktop storage now lives on `D:\DockerData\wsl` and `D:\DockerData\vm-data`
 - Host-side `localhost:8000` access from Windows remained unreliable after Docker recovery even while the container served healthy responses internally
 - Per user direction on 2026-04-14, Docker host-port verification is no longer a phase-by-phase gate and will be revisited during final deployment/hardening
+- The Phase 3 benchmark CLI seeds and then cleans up a deterministic fixture so retrieval benchmarking stays repeatable without polluting the live corpus
 
 ## Update Rule
 Update this file after each verified phase closure together with:

@@ -54,3 +54,12 @@
 - Source URL: `https://op.europa.eu/o/opportal-service/download-handler?format=PDF&identifier=dc8116a1-3fe6-11ef-865a-01aa75ed71a1&language=en&productionSystem=cellar`
 - Stored document id: `106ea9d5-f534-4620-873f-68ff43cabf72`
 - Corpus stats from the verified ingest: `144` pages, `331` chunks
+
+## Current Retrieval State
+- Verified on 2026-04-14: `/api/v1/search` is wired end to end on top of the ingested EU AI Act corpus.
+- Retrieval strategies now implemented: `vector_only`, `bm25_only`, `hybrid`, `hybrid_reranked`.
+- Persistence now includes:
+  - `queries` for request metadata and retrieval settings
+  - `retrievals` for ranked chunk traces and score components
+  - `answers` and `citations` tables pre-created in migration `003` for Phase 4 population
+- Benchmarking uses a seeded synthetic fixture for deterministic strategy comparison and cleans that fixture up after each run so the live corpus remains unchanged.

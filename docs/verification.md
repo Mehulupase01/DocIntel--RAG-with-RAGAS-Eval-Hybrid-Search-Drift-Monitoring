@@ -46,3 +46,25 @@ uv run python -m docintel.tools.ingest_eu_ai_act --path "..\..\data\source\eu_ai
 - ASGI `GET /api/v1/documents`: Passed on 2026-04-14 and returned the ingested document in the paginated response.
 - ASGI `GET /api/v1/documents/{id}`: Passed on 2026-04-14 and returned the ingested document with metadata and `chunk_count`.
 - Host-side `curl http://localhost:8000/api/v1/documents` remained unreliable on this Windows machine, so route verification used the current local ASGI app instead of Docker host-port forwarding, per the user's updated execution policy.
+
+## Phase 3 Commands
+
+```powershell
+cd "apps/api"
+uv run alembic upgrade head
+uv run pytest tests/test_bm25.py tests/test_vector.py tests/test_fusion.py tests/test_reranker.py tests/test_search_endpoint.py -v
+uv run python -m docintel.tools.benchmark_retrieval --top-k 10
+curl -X POST http://localhost:8000/api/v1/search -H "X-API-Key: $API_KEY" -H "Content-Type: application/json" -d '{"query":"What is a high-risk AI system?","strategy":"hybrid_reranked","top_k":5}'
+```
+
+## Phase 3 Status
+- `uv run alembic upgrade head`: Passed on 2026-04-14 against the main `docintel` database.
+- `uv run pytest tests/test_bm25.py tests/test_vector.py tests/test_fusion.py tests/test_reranker.py tests/test_search_endpoint.py -v`: Passed on 2026-04-14 (`7 passed`).
+- `uv run python -m docintel.tools.benchmark_retrieval --top-k 10`: Passed on 2026-04-14 using the deterministic seeded fixture.
+- Benchmark result on the seeded fixture:
+  - `vector_only`: precision@10 `0.100`, recall@10 `0.500`
+  - `bm25_only`: precision@10 `0.150`, recall@10 `0.750`
+  - `hybrid`: precision@10 `0.150`, recall@10 `0.750`
+  - `hybrid_reranked`: precision@10 `0.150`, recall@10 `0.750`
+- ASGI `POST /api/v1/search`: Passed on 2026-04-14 and returned `200` against the real EU AI Act corpus with persisted query and retrieval trace rows.
+- Host-side `curl http://localhost:8000/api/v1/search` remains subject to flaky Windows port forwarding on this machine, so the route verification was executed against the local ASGI app per the user's updated execution policy.

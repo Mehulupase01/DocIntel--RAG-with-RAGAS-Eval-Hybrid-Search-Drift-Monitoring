@@ -11,6 +11,7 @@ from .logging_setup import configure_logging, get_logger
 from .routers.documents import router as documents_router
 from .routers.health import router as health_router
 from .routers.metrics import metrics_app
+from .routers.search import router as search_router
 
 logger = get_logger(__name__)
 
@@ -33,6 +34,7 @@ def create_app() -> FastAPI:
     api_router = APIRouter(prefix="/api/v1")
     api_router.include_router(documents_router)
     api_router.include_router(health_router)
+    api_router.include_router(search_router)
 
     app.add_middleware(
         CORSMiddleware,

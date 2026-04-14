@@ -1,30 +1,28 @@
 # Handoff
 
 ## Current Status
-- Active phase: Phase 3 - Retrieval Layer
-- Phase 2 objective: upload a PDF, parse it, chunk it, embed it, persist `documents` + `chunks`, and verify the real EU AI Act corpus end to end
-- Phase 2 delivered:
-  - `documents` and `chunks` SQLAlchemy models plus migration `002_documents_and_chunks.py`
-  - document schemas and `/api/v1/documents` CRUD + reingest routes
-  - ingestion services for PDF loading, heading-aware chunking, embeddings, and orchestration
-  - CLI `docintel.tools.ingest_eu_ai_act`
-  - synthetic PDF fixture plus chunker/embedder/document endpoint tests
-  - source-data and ingestion docs
-  - real-PDF hardening for enum value mapping, long single-block page splitting, structural heading extraction, and UTF-8-safe console logging
-- Phase 2 verified:
+- Active phase: Phase 4 - Generation & Citations
+- Phase 3 objective: hybrid retrieval over the ingested EU AI Act corpus, with BM25, pgvector ANN, RRF fusion, cross-encoder reranking, `/api/v1/search`, and persisted `queries` plus `retrievals`
+- Phase 3 delivered:
+  - `queries` and `retrievals` SQLAlchemy models plus migration `003_queries_retrievals_answers.py`
+  - seeded `answers` and `citations` tables created in migration order for Phase 4
+  - retrieval services for BM25, pgvector ANN, RRF fusion, reranking, and public hybrid orchestration
+  - `/api/v1/search` endpoint with API-key protection and score-component-aware responses
+  - retrieval benchmark CLI using a deterministic seeded fixture
+  - retrieval docs plus BM25/vector/fusion/reranker/search endpoint tests
+- Phase 3 verified:
   - `uv run alembic upgrade head`
-  - `uv run pytest tests/test_chunker.py tests/test_embedder.py tests/test_documents.py -v` (`8 passed`)
-  - official EU AI Act PDF ingested successfully via CLI
-  - verified persisted document: `106ea9d5-f534-4620-873f-68ff43cabf72`
-  - verified corpus stats: `144` pages, `331` chunks
-  - ASGI `GET /api/v1/documents` and `GET /api/v1/documents/{id}` returned the ingested document
+  - `uv run pytest tests/test_bm25.py tests/test_vector.py tests/test_fusion.py tests/test_reranker.py tests/test_search_endpoint.py -v` (`7 passed`)
+  - `uv run python -m docintel.tools.benchmark_retrieval --top-k 10`
+  - benchmark result: `hybrid_reranked` precision@10 `0.150` / recall@10 `0.750` vs `vector_only` precision@10 `0.100` / recall@10 `0.500`
+  - ASGI `POST /api/v1/search` returned `200` against the real EU AI Act corpus and persisted retrieval traces
 - Residual environment note: Windows host access to `localhost:8000` remains flaky, so current-phase route verification used in-process ASGI calls per the user's updated execution policy
 
 ## Next Step
-- Execute Phase 3 from the blueprint only:
-  - add `queries` and `retrievals` persistence models and migration `003`
-  - implement BM25, pgvector ANN, RRF fusion, and cross-encoder reranking
-  - add `/api/v1/search`
-  - persist retrieval traces with all score components
-  - run Phase 3 verification
-  - update continuity docs, commit, and push
+- Execute Phase 4 from the blueprint only:
+  - add answer generation services, response schemas, and `/api/v1/answer`
+  - generate citation-grounded answers from retrieval context and persist `answers` plus `citations`
+  - implement citation extraction and OpenRouter client wiring without changing the blueprint contracts
+  - verify Phase 4 with tests, generation CLI/API checks, continuity doc updates, then commit and push
+- Runtime gate for Phase 4 closure:
+  - real end-to-end answer generation verification will require `OPENROUTER_API_KEY`
