@@ -1,0 +1,14 @@
+services:
+  dashboard:
+    build:
+      context: .
+      dockerfile: apps/dashboard/Dockerfile
+    ports:
+      - "8501:8501"
+    environment:
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@db:5432/docintel
+      API_BASE_URL: http://api:8000/api/v1
+      API_KEY: ${API_KEYS:-dev-key-change-me}
+    depends_on:
+      api:
+        condition: service_started

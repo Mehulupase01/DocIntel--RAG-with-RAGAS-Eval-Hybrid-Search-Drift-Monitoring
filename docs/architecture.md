@@ -111,3 +111,14 @@
   - `query_drift_score` as Evidently feature-drift share
   - `retrieval_quality_delta`
   - rank-stability delta retained in `payload_json`
+
+## Current Dashboard State
+- Verified on 2026-04-14: the dashboard domain is implemented with:
+  - a Streamlit home page for KPIs
+  - four pages for eval trends, drift reports, cost/latency, and retrieval exploration
+  - direct read-only DB queries for analytics and a live HTTP `/search` client for exploration
+  - a compose overlay exposing the dashboard on port `8501`
+- Dashboard verification currently uses:
+  - DB-helper tests in `apps/dashboard/tests/test_db_queries.py`
+  - Streamlit `AppTest` smoke rendering for every page script
+  - `docker compose ... config` validation for the full-stack overlay

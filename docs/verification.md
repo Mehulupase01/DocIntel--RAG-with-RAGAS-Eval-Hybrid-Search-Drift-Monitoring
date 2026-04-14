@@ -171,3 +171,28 @@ curl -H "X-API-Key: $API_KEY" http://localhost:8000/api/v1/drift/reports
   - app lifespan startup logged registered job `weekly-drift-report`
   - next scheduled run reported as `2026-04-21 02:00:00+00:00`
 - Host-side `curl http://localhost:8000/api/v1/drift/reports` remains subject to the same flaky Windows port forwarding, so the route verification used the local ASGI app per the user's updated execution policy.
+
+## Phase 8 Commands
+
+```powershell
+docker compose -f docker-compose.yml -f ops/docker/compose.full.yml up -d
+# Generate some traffic
+curl -X POST http://localhost:8000/api/v1/search ...
+curl -X POST http://localhost:8000/api/v1/answer ...
+uv run python -m docintel.tools.run_eval
+# Visit dashboard
+start http://localhost:8501
+```
+
+## Phase 8 Status
+- `uv sync` in `apps/dashboard`: Passed on 2026-04-14.
+- `uv run pytest tests/test_db_queries.py -v`: Passed on 2026-04-14 (`3 passed`).
+- `uv run python -m compileall app.py lib pages tests`: Passed on 2026-04-14.
+- Streamlit smoke verification on 2026-04-14:
+  - `AppTest` rendered `app.py`
+  - `AppTest` rendered `pages/1_Eval_Trends.py`
+  - `AppTest` rendered `pages/2_Drift_Reports.py`
+  - `AppTest` rendered `pages/3_Cost_and_Latency.py`
+  - `AppTest` rendered `pages/4_Retrieval_Explorer.py`
+- `docker compose -f docker-compose.yml -f ops/docker/compose.full.yml config`: Passed on 2026-04-14.
+- Per user direction on 2026-04-14, full `docker compose ... up -d` with the dashboard service is deferred to the final deployment/hardening gate instead of blocking intermediate phase closure.

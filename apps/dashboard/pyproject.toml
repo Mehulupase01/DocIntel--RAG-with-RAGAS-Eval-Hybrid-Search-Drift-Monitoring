@@ -1,0 +1,25 @@
+[build-system]
+requires = ["hatchling>=1.27.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "docintel-dashboard"
+version = "0.1.0"
+description = "DocIntel Streamlit operations dashboard"
+requires-python = "==3.12.*"
+dependencies = [
+  "streamlit==1.45.0",
+  "pandas==2.2.3",
+  "plotly==5.24.1",
+  "httpx==0.28.1",
+  "sqlalchemy==2.0.48",
+  "psycopg[binary]==3.2.4",
+  "pytest==8.4.2",
+]
+
+[tool.hatch.build.targets.wheel]
+only-include = ["app.py", "lib", "pages", "tests"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

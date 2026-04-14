@@ -15,6 +15,8 @@
 - `uv run --directory apps/api python -m docintel.tools.benchmark_retrieval --top-k 10`
 - `uv run --directory apps/api python -m docintel.tools.run_eval`
 - `uv run --directory apps/api python -m docintel.tools.run_drift`
+- `uv run --directory apps/dashboard pytest`
+- `uv run --directory apps/dashboard streamlit run app.py`
 
 ## Active Decisions
 - Modular monolith FastAPI + Postgres + pgvector + Streamlit dashboard
@@ -34,6 +36,7 @@
 - Phase 5 evaluation harness: complete (live OpenRouter judge verification deferred to final deployment gate by user instruction)
 - Phase 6 observability: complete
 - Phase 7 drift monitoring: complete
+- Phase 8 streamlit dashboard: complete
 - Verified on 2026-04-14:
   - `uv sync`
   - `uv run alembic upgrade head`
@@ -73,6 +76,12 @@
   - ASGI `GET /api/v1/drift/reports`
   - app lifespan startup showing the registered weekly APScheduler job
   - `uv run pytest tests/test_health.py tests/test_chunker.py tests/test_embedder.py tests/test_documents.py tests/test_bm25.py tests/test_vector.py tests/test_fusion.py tests/test_reranker.py tests/test_search_endpoint.py tests/test_citation_extractor.py tests/test_answer_endpoint.py tests/test_eval_runner.py tests/test_metrics.py tests/test_tracing_middleware.py tests/test_drift_runner.py -v`
+- Verified on 2026-04-14 for Phase 8:
+  - `uv sync` in `apps/dashboard`
+  - `uv run pytest tests/test_db_queries.py -v`
+  - `uv run python -m compileall app.py lib pages tests`
+  - Streamlit `AppTest` render pass for `app.py` plus all four page scripts
+  - `docker compose -f docker-compose.yml -f ops/docker/compose.full.yml config`
 - Phase 3 benchmark result on seeded fixture:
   - `vector_only`: precision@10 `0.100`, recall@10 `0.500`
   - `hybrid_reranked`: precision@10 `0.150`, recall@10 `0.750`
@@ -95,6 +104,10 @@
   - HTML artifact persistence is verified at `apps/api/artifacts/drift/53df52b6-07e9-49b8-8b6a-a213c35e9a37.html`
   - ASGI `GET /api/v1/drift/reports` returned the persisted report with a local `html_url`
   - app startup logs showed the registered APScheduler job `weekly-drift-report` with the next run at `2026-04-21 02:00:00+00:00`
+- Phase 8 dashboard verification:
+  - dashboard helper tests cover KPI, eval, drift, cost, latency, and model-breakdown query shapes
+  - Streamlit `AppTest` successfully rendered `app.py`, `1_Eval_Trends.py`, `2_Drift_Reports.py`, `3_Cost_and_Latency.py`, and `4_Retrieval_Explorer.py`
+  - `ops/docker/compose.full.yml` validates cleanly and supplies the dashboard service on port `8501`
 - Official AI Act verification ingest:
   - source URL: `https://op.europa.eu/o/opportal-service/download-handler?format=PDF&identifier=dc8116a1-3fe6-11ef-865a-01aa75ed71a1&language=en&productionSystem=cellar`
   - SHA256: `bba630444b3278e881066774002a1d7824308934f49ccfa203e65be43692f55e`
@@ -106,6 +119,7 @@
 - Per user direction on 2026-04-14, Docker host-port verification is no longer a phase-by-phase gate and will be revisited during final deployment/hardening
 - Per user direction on 2026-04-14, OpenRouter-backed live verification for `/api/v1/answer` and later eval flows is deferred to the final deployment/hardening gate; intermediate phase closure may proceed on passing local tests and stubbed provider integration checks
 - The local `docintel` database initially had current-window traffic but no prior 7-day reference traffic on 2026-04-14, so Phase 7 verification seeded deterministic historical query/retrieval windows in the local DB before running the one-shot drift CLI
+- Per the same execution policy, full Docker bring-up with the dashboard container is deferred to the final deployment/hardening pass; Phase 8 used `docker compose ... config`, dashboard tests, and Streamlit render smoke checks for intermediate closure
 - The Phase 3 benchmark CLI seeds and then cleans up a deterministic fixture so retrieval benchmarking stays repeatable without polluting the live corpus
 
 ## Update Rule
