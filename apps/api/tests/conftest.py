@@ -13,8 +13,14 @@ from sqlalchemy.pool import NullPool
 TEST_DB_URL = "sqlite+aiosqlite:///:memory:"
 TEST_POSTGRES_ADMIN_URL = "postgresql+asyncpg://postgres:postgres@localhost:5432/postgres"
 TEST_POSTGRES_DB_URL = "postgresql+asyncpg://postgres:postgres@localhost:5432/docintel_test"
+TEST_ARTIFACT_STORAGE_PATH = str((Path(__file__).parent / ".artifacts").resolve())
+TEST_MODEL_CACHE_DIR = str((Path(__file__).parent / ".model_cache").resolve())
 os.environ.setdefault("DATABASE_URL", TEST_DB_URL)
 os.environ.setdefault("API_KEYS", "dev-key-change-me")
+os.environ.setdefault("ARTIFACT_STORAGE_PATH", TEST_ARTIFACT_STORAGE_PATH)
+os.environ.setdefault("MODEL_CACHE_DIR", TEST_MODEL_CACHE_DIR)
+Path(TEST_ARTIFACT_STORAGE_PATH).mkdir(parents=True, exist_ok=True)
+Path(TEST_MODEL_CACHE_DIR).mkdir(parents=True, exist_ok=True)
 
 from docintel.database import get_db  # noqa: E402
 from docintel.main import app  # noqa: E402

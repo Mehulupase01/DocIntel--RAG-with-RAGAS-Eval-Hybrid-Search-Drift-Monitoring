@@ -26,6 +26,8 @@ jobs:
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/docintel
       API_KEYS: dev-key-change-me
       SECRET_KEY: dev-secret-not-for-production
+      MODEL_CACHE_DIR: ${{ github.workspace }}/apps/api/.model_cache
+      ARTIFACT_STORAGE_PATH: ${{ github.workspace }}/apps/api/artifacts
     services:
       postgres:
         image: pgvector/pgvector:pg16
