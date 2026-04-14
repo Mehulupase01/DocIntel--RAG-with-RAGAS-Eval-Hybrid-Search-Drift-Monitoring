@@ -70,6 +70,7 @@ async def postgres_db_session(postgres_engine):
         await conn.run_sync(Base.metadata.drop_all)
         await conn.execute(text("DROP TYPE IF EXISTS document_status CASCADE"))
         await conn.execute(text("DROP TYPE IF EXISTS retrieval_strategy CASCADE"))
+        await conn.execute(text("DROP TYPE IF EXISTS eval_run_status CASCADE"))
         await conn.run_sync(Base.metadata.create_all)
 
     session_factory = async_sessionmaker(postgres_engine, class_=AsyncSession, expire_on_commit=False)
@@ -80,6 +81,7 @@ async def postgres_db_session(postgres_engine):
         await conn.run_sync(Base.metadata.drop_all)
         await conn.execute(text("DROP TYPE IF EXISTS document_status CASCADE"))
         await conn.execute(text("DROP TYPE IF EXISTS retrieval_strategy CASCADE"))
+        await conn.execute(text("DROP TYPE IF EXISTS eval_run_status CASCADE"))
 
 
 @pytest_asyncio.fixture

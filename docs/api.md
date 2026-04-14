@@ -58,3 +58,31 @@ Example response shape:
   "latency_ms": 812
 }
 ```
+
+## `POST /api/v1/eval/runs`
+
+Creates an evaluation run over the versioned fixture and returns `202 Accepted` while the run continues in the background.
+
+Example request:
+
+```json
+{
+  "suite_version": "v1",
+  "retrieval_strategy": "hybrid_reranked",
+  "generation_model": "anthropic/claude-haiku-4-5",
+  "judge_model": "openai/gpt-4o-mini",
+  "fail_fast": false
+}
+```
+
+## `GET /api/v1/eval/runs`
+
+Returns paginated evaluation runs. Supports `page`, `per_page`, and optional `status`.
+
+## `GET /api/v1/eval/runs/{id}`
+
+Returns one evaluation run by id.
+
+## `GET /api/v1/eval/runs/{id}/cases`
+
+Returns paginated evaluation cases for a run. Supports `page`, `per_page`, and optional `passed`.

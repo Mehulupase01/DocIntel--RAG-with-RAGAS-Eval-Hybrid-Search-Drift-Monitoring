@@ -91,3 +91,27 @@ curl -X POST http://localhost:8000/api/v1/answer -H "X-API-Key: $API_KEY" -H "Co
   - `queries`, `retrievals`, `answers`, and `citations` rows persist correctly
   - upstream provider failures return `502 LLM_PROVIDER_ERROR`
 - Per user direction on 2026-04-14, the live OpenRouter-backed `curl /api/v1/answer` verification is deferred to the final deployment/hardening gate and does not block intermediate phase closure.
+
+## Phase 5 Commands
+
+```powershell
+cd "apps/api"
+uv run alembic upgrade head
+uv run pytest tests/test_eval_runner.py -v
+uv run python -m docintel.tools.run_eval --suite-version v1 --strategy hybrid_reranked
+uv run python -m docintel.services.evaluation.ci_gate --fail-on-breach
+```
+
+## Phase 5 Status
+- `uv run alembic upgrade head`: Passed on 2026-04-14 against the main `docintel` database.
+- `uv run pytest tests/test_eval_runner.py -v`: Passed on 2026-04-14 (`4 passed`).
+- Full regression sweep through implemented Phases 1-5 passed on 2026-04-14:
+  - `uv run pytest tests/test_health.py tests/test_chunker.py tests/test_embedder.py tests/test_documents.py tests/test_bm25.py tests/test_vector.py tests/test_fusion.py tests/test_reranker.py tests/test_search_endpoint.py tests/test_citation_extractor.py tests/test_answer_endpoint.py tests/test_eval_runner.py -v`
+  - result: `27 passed`
+- Eval tests verify:
+  - fixture schema validation for `fixtures/eu_ai_act_qa_v1.json`
+  - persisted `eval_runs` and `eval_cases`
+  - `/api/v1/eval/runs` and `/api/v1/eval/runs/{id}/cases` pagination
+  - CI gate exits non-zero on threshold breach
+- `.github/workflows/ragas-eval.yml` is authored and committed for PR gating.
+- Per user direction on 2026-04-14, the live OpenRouter-backed `run_eval` execution and secret-backed GitHub Actions run are deferred to the final deployment/hardening gate and do not block intermediate phase closure.

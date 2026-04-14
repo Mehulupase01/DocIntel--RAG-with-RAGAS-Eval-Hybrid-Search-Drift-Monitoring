@@ -73,3 +73,14 @@
   - estimated cost in USD
   - end-to-end latency and finish reason
 - Intermediate verification currently relies on stubbed provider integration tests; real OpenRouter-backed calls are deferred to the final deployment/hardening gate by user instruction.
+
+## Current Evaluation State
+- Verified on 2026-04-14: the evaluation domain is implemented with persisted `eval_runs` and `eval_cases`, fixture loading, threshold evaluation, background-ready endpoints, CLI entrypoints, and a PR workflow definition.
+- Current fixture assets:
+  - `fixtures/eu_ai_act_qa_v1.json`
+  - `fixtures/eu_ai_act_qa_v1.schema.json`
+  - `fixtures/README.md`
+  - `fixtures/ISSUES.md`
+- Current fixture payload version: `v0.1`
+- Current fixture size: `25` cases
+- Intermediate verification currently relies on stubbed scoring and local persistence/endpoint tests; live OpenRouter-backed eval execution is deferred to the final deployment/hardening gate by user instruction.

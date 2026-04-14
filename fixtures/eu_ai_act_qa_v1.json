@@ -1,0 +1,181 @@
+{
+  "version": "v0.1",
+  "source_doc_sha256": "bba630444b3278e881066774002a1d7824308934f49ccfa203e65be43692f55e",
+  "cases": [
+    {
+      "id": "case-001",
+      "question": "What is the definition of a high-risk AI system under the EU AI Act?",
+      "ground_truth": "An AI system is high-risk when it falls within the product-safety cases covered by Union harmonisation legislation or within one of the Annex III use cases referenced by Article 6.",
+      "expected_articles": ["Article 6", "Annex III"],
+      "category": "definitions"
+    },
+    {
+      "id": "case-002",
+      "question": "Which AI practices are prohibited by the EU AI Act?",
+      "ground_truth": "Article 5 prohibits specific AI practices such as certain manipulative or exploitative uses, certain social-scoring uses, and tightly constrained real-time remote biometric identification scenarios.",
+      "expected_articles": ["Article 5"],
+      "category": "prohibited_practices"
+    },
+    {
+      "id": "case-003",
+      "question": "What does the EU AI Act say about AI literacy?",
+      "ground_truth": "The Act requires providers and deployers to take measures so that people dealing with AI systems have a sufficient level of AI literacy for their role and context of use.",
+      "expected_articles": ["Article 4"],
+      "category": "governance"
+    },
+    {
+      "id": "case-004",
+      "question": "What must a provider establish for risk management in high-risk AI systems?",
+      "ground_truth": "Providers of high-risk AI systems must establish, implement, document, and maintain a risk-management system throughout the system lifecycle.",
+      "expected_articles": ["Article 9"],
+      "category": "high_risk_obligations"
+    },
+    {
+      "id": "case-005",
+      "question": "What data governance obligations apply to high-risk AI systems?",
+      "ground_truth": "Training, validation, and testing datasets for high-risk AI systems must be subject to appropriate governance and management practices, including relevance, representativeness, and error mitigation considerations.",
+      "expected_articles": ["Article 10"],
+      "category": "data_governance"
+    },
+    {
+      "id": "case-006",
+      "question": "What technical documentation must providers prepare for high-risk AI systems?",
+      "ground_truth": "Providers must draw up technical documentation demonstrating compliance, and the documentation content is specified in Annex IV.",
+      "expected_articles": ["Article 11", "Annex IV"],
+      "category": "documentation"
+    },
+    {
+      "id": "case-007",
+      "question": "What record-keeping or logging duty applies to high-risk AI systems?",
+      "ground_truth": "High-risk AI systems must be designed and developed with logging capabilities that enable events relevant for identifying risks and monitoring operation to be recorded.",
+      "expected_articles": ["Article 12"],
+      "category": "logging"
+    },
+    {
+      "id": "case-008",
+      "question": "What information must providers give to deployers of high-risk AI systems?",
+      "ground_truth": "Providers must supply instructions for use and other information needed so deployers can operate the high-risk AI system in accordance with its intended purpose and oversight requirements.",
+      "expected_articles": ["Article 13"],
+      "category": "transparency"
+    },
+    {
+      "id": "case-009",
+      "question": "How does the EU AI Act describe human oversight for high-risk AI systems?",
+      "ground_truth": "High-risk AI systems must be designed so natural persons can effectively oversee them and intervene where necessary to prevent or minimise risks to health, safety, or fundamental rights.",
+      "expected_articles": ["Article 14"],
+      "category": "human_oversight"
+    },
+    {
+      "id": "case-010",
+      "question": "What does the Act require for accuracy, robustness, and cybersecurity?",
+      "ground_truth": "High-risk AI systems must achieve appropriate levels of accuracy, robustness, and cybersecurity, and those characteristics must remain consistent throughout the lifecycle as relevant.",
+      "expected_articles": ["Article 15"],
+      "category": "technical_requirements"
+    },
+    {
+      "id": "case-011",
+      "question": "What quality management obligation applies to providers of high-risk AI systems?",
+      "ground_truth": "Providers must have a documented quality management system that supports compliance with the obligations applicable to high-risk AI systems.",
+      "expected_articles": ["Article 17"],
+      "category": "quality_management"
+    },
+    {
+      "id": "case-012",
+      "question": "What corrective action duty applies when a high-risk AI system is not in conformity?",
+      "ground_truth": "If a high-risk AI system is not compliant, the provider must immediately take corrective action, including bringing it into conformity, withdrawing it, or recalling it as appropriate, and inform relevant actors when required.",
+      "expected_articles": ["Article 20"],
+      "category": "corrective_actions"
+    },
+    {
+      "id": "case-013",
+      "question": "What is an authorised representative expected to do under the Act?",
+      "ground_truth": "An authorised representative acts on the provider's behalf within the Union for specified tasks and must be mandated in writing for the obligations assigned by the Act.",
+      "expected_articles": ["Article 22"],
+      "category": "market_operators"
+    },
+    {
+      "id": "case-014",
+      "question": "What obligations apply to importers of high-risk AI systems?",
+      "ground_truth": "Importers must ensure that the provider has completed the required conformity steps before placing a high-risk AI system on the market and must not place non-compliant systems on the market.",
+      "expected_articles": ["Article 23"],
+      "category": "market_operators"
+    },
+    {
+      "id": "case-015",
+      "question": "What obligations apply to distributors of high-risk AI systems?",
+      "ground_truth": "Distributors must act with due care, verify required markings and documentation, and refrain from making available high-risk AI systems they consider non-compliant.",
+      "expected_articles": ["Article 24"],
+      "category": "market_operators"
+    },
+    {
+      "id": "case-016",
+      "question": "What are key deployer obligations for high-risk AI systems?",
+      "ground_truth": "Deployers must use high-risk AI systems according to the instructions for use, assign appropriate human oversight where required, and keep relevant logs or records when the Act requires them.",
+      "expected_articles": ["Article 26"],
+      "category": "deployers"
+    },
+    {
+      "id": "case-017",
+      "question": "What does the EU AI Act require for conformity assessment of high-risk AI systems?",
+      "ground_truth": "High-risk AI systems must undergo the applicable conformity assessment procedure before being placed on the market or put into service.",
+      "expected_articles": ["Article 43"],
+      "category": "conformity_assessment"
+    },
+    {
+      "id": "case-018",
+      "question": "What is the role of the EU declaration of conformity?",
+      "ground_truth": "The EU declaration of conformity is the provider's formal statement that the high-risk AI system complies with the applicable requirements, and its required contents are set out in Annex V.",
+      "expected_articles": ["Article 47", "Annex V"],
+      "category": "conformity_assessment"
+    },
+    {
+      "id": "case-019",
+      "question": "What does CE marking signify for a high-risk AI system?",
+      "ground_truth": "CE marking indicates that the high-risk AI system conforms to the applicable requirements of the Act and relevant Union harmonisation legislation where applicable.",
+      "expected_articles": ["Article 48"],
+      "category": "conformity_assessment"
+    },
+    {
+      "id": "case-020",
+      "question": "What information must be submitted when registering certain high-risk AI systems?",
+      "ground_truth": "Registration requires the information specified for the EU database, including provider and system identification details and conformity references, as described in Annex VIII.",
+      "expected_articles": ["Article 49", "Annex VIII"],
+      "category": "registration"
+    },
+    {
+      "id": "case-021",
+      "question": "What transparency duty applies to AI systems that interact with natural persons?",
+      "ground_truth": "Certain AI systems must inform natural persons that they are interacting with AI unless this is obvious from the context and the circumstances of use.",
+      "expected_articles": ["Article 50"],
+      "category": "transparency"
+    },
+    {
+      "id": "case-022",
+      "question": "What transparency duty applies to deep fakes under the EU AI Act?",
+      "ground_truth": "AI-generated or manipulated deep-fake content must be disclosed as artificially generated or manipulated, subject to the applicable exceptions in the Act.",
+      "expected_articles": ["Article 50"],
+      "category": "transparency"
+    },
+    {
+      "id": "case-023",
+      "question": "What post-market monitoring obligation applies to high-risk AI systems?",
+      "ground_truth": "Providers must establish and document a post-market monitoring system proportionate to the nature of the high-risk AI system and its risks.",
+      "expected_articles": ["Article 72"],
+      "category": "post_market_monitoring"
+    },
+    {
+      "id": "case-024",
+      "question": "What must providers do about serious incidents involving high-risk AI systems?",
+      "ground_truth": "Providers must report serious incidents and certain malfunctioning of high-risk AI systems to the relevant authorities without undue delay in line with the reporting rules of the Act.",
+      "expected_articles": ["Article 73"],
+      "category": "incident_reporting"
+    },
+    {
+      "id": "case-025",
+      "question": "What core documentation or information obligations apply to providers of general-purpose AI models?",
+      "ground_truth": "Providers of general-purpose AI models must keep technical documentation and provide information required by the Act, including the materials needed for downstream compliance obligations.",
+      "expected_articles": ["Article 53"],
+      "category": "gpai"
+    }
+  ]
+}
