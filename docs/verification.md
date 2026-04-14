@@ -68,3 +68,26 @@ curl -X POST http://localhost:8000/api/v1/search -H "X-API-Key: $API_KEY" -H "Co
   - `hybrid_reranked`: precision@10 `0.150`, recall@10 `0.750`
 - ASGI `POST /api/v1/search`: Passed on 2026-04-14 and returned `200` against the real EU AI Act corpus with persisted query and retrieval trace rows.
 - Host-side `curl http://localhost:8000/api/v1/search` remains subject to flaky Windows port forwarding on this machine, so the route verification was executed against the local ASGI app per the user's updated execution policy.
+
+## Phase 4 Commands
+
+```powershell
+cd "apps/api"
+uv run alembic upgrade head
+uv run pytest tests/test_citation_extractor.py tests/test_answer_endpoint.py -v
+curl -X POST http://localhost:8000/api/v1/answer -H "X-API-Key: $API_KEY" -H "Content-Type: application/json" -d '{"query":"Define high-risk AI system per the EU AI Act","top_k":6}'
+```
+
+## Phase 4 Status
+- `uv run alembic upgrade head`: Passed on 2026-04-14 against the main `docintel` database.
+- `uv run pytest tests/test_citation_extractor.py tests/test_answer_endpoint.py -v`: Passed on 2026-04-14 (`5 passed`).
+- Full regression sweep through implemented Phases 1-4 passed on 2026-04-14:
+  - `uv run pytest tests/test_health.py tests/test_chunker.py tests/test_embedder.py tests/test_documents.py tests/test_bm25.py tests/test_vector.py tests/test_fusion.py tests/test_reranker.py tests/test_search_endpoint.py tests/test_citation_extractor.py tests/test_answer_endpoint.py -v`
+  - result: `23 passed`
+- Stubbed OpenRouter integration verifies:
+  - citation markers are extracted and removed from the final answer text
+  - unknown markers are dropped
+  - `/api/v1/answer` returns citation metadata mapped to real chunks
+  - `queries`, `retrievals`, `answers`, and `citations` rows persist correctly
+  - upstream provider failures return `502 LLM_PROVIDER_ERROR`
+- Per user direction on 2026-04-14, the live OpenRouter-backed `curl /api/v1/answer` verification is deferred to the final deployment/hardening gate and does not block intermediate phase closure.

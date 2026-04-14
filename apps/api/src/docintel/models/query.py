@@ -3,6 +3,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 from enum import Enum
+from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, Enum as SAEnum, Float, Integer, String, Text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
@@ -10,6 +11,10 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
 from .base import Base
+
+if TYPE_CHECKING:
+    from .answer import Answer
+    from .retrieval import Retrieval
 
 
 class RetrievalStrategy(str, Enum):
@@ -42,3 +47,4 @@ class Query(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     retrievals: Mapped[list["Retrieval"]] = relationship(back_populates="query", cascade="all, delete-orphan")
+    answers: Mapped[list["Answer"]] = relationship(back_populates="query", cascade="all, delete-orphan")

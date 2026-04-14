@@ -63,3 +63,13 @@
   - `retrievals` for ranked chunk traces and score components
   - `answers` and `citations` tables pre-created in migration `003` for Phase 4 population
 - Benchmarking uses a seeded synthetic fixture for deterministic strategy comparison and cleans that fixture up after each run so the live corpus remains unchanged.
+
+## Current Generation State
+- Verified on 2026-04-14: `/api/v1/answer` is implemented with retrieval-backed prompting, OpenRouter-native generation, citation extraction, and persistence into `answers` plus `citations`.
+- Persisted answer records now include:
+  - model id
+  - prompt and response text
+  - prompt/completion token counts
+  - estimated cost in USD
+  - end-to-end latency and finish reason
+- Intermediate verification currently relies on stubbed provider integration tests; real OpenRouter-backed calls are deferred to the final deployment/hardening gate by user instruction.

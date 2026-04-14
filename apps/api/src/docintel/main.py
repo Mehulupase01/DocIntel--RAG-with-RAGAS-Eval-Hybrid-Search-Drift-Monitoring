@@ -8,6 +8,7 @@ from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .logging_setup import configure_logging, get_logger
+from .routers.answer import router as answer_router
 from .routers.documents import router as documents_router
 from .routers.health import router as health_router
 from .routers.metrics import metrics_app
@@ -35,6 +36,7 @@ def create_app() -> FastAPI:
     api_router.include_router(documents_router)
     api_router.include_router(health_router)
     api_router.include_router(search_router)
+    api_router.include_router(answer_router)
 
     app.add_middleware(
         CORSMiddleware,
