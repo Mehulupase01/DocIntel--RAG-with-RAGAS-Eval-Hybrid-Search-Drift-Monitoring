@@ -135,3 +135,39 @@ curl http://localhost:8000/metrics | grep docintel_
   - `/metrics` output contained `docintel_requests_total`, `docintel_request_duration_seconds`, and `docintel_retrieval_score`
   - `/metrics` showed a non-zero counter line for `path="/api/v1/search"`
 - LangSmith live verification was not performed because `LANGSMITH_API_KEY` is optional and not required for intermediate phase closure.
+
+## Phase 7 Commands
+
+```powershell
+docker compose up -d
+cd "apps/api"
+uv run alembic upgrade head
+uv run pytest tests/test_drift_runner.py -v
+uv run python -m docintel.tools.run_drift --window-days 7 --reference-window-days 7
+curl -H "X-API-Key: $API_KEY" http://localhost:8000/api/v1/drift/reports
+```
+
+## Phase 7 Status
+- `uv run alembic upgrade head`: Passed on 2026-04-14 against the main `docintel` database.
+- `uv run pytest tests/test_drift_runner.py -v`: Passed on 2026-04-14 (`4 passed`).
+- Full regression sweep through implemented Phases 1-7 passed on 2026-04-14:
+  - `uv run pytest tests/test_health.py tests/test_chunker.py tests/test_embedder.py tests/test_documents.py tests/test_bm25.py tests/test_vector.py tests/test_fusion.py tests/test_reranker.py tests/test_search_endpoint.py tests/test_citation_extractor.py tests/test_answer_endpoint.py tests/test_eval_runner.py tests/test_metrics.py tests/test_tracing_middleware.py tests/test_drift_runner.py -v`
+  - result: `33 passed`
+- Local DB precondition note:
+  - the main `docintel` database had current-window traffic but no prior 7-day reference traffic on 2026-04-14
+  - deterministic historical query/retrieval windows were seeded into the local DB before the one-shot drift CLI was executed
+- `uv run python -m docintel.tools.run_drift --window-days 7 --reference-window-days 7`: Passed on 2026-04-14 and created:
+  - report id: `53df52b6-07e9-49b8-8b6a-a213c35e9a37`
+  - status: `alert`
+  - `embedding_drift_score`: `0.10519221945645096`
+  - `query_drift_score`: `1.0`
+  - `retrieval_quality_delta`: `-0.729727867565463`
+  - HTML artifact: `apps/api/artifacts/drift/53df52b6-07e9-49b8-8b6a-a213c35e9a37.html`
+- In-process route verification on 2026-04-14:
+  - ASGI `GET /api/v1/drift/reports`: returned `200`
+  - response `meta.total`: `1`
+  - response contained `status="alert"` and a local `html_url`
+- Scheduler verification on 2026-04-14:
+  - app lifespan startup logged registered job `weekly-drift-report`
+  - next scheduled run reported as `2026-04-21 02:00:00+00:00`
+- Host-side `curl http://localhost:8000/api/v1/drift/reports` remains subject to the same flaky Windows port forwarding, so the route verification used the local ASGI app per the user's updated execution policy.

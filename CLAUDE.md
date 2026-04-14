@@ -33,6 +33,7 @@
 - Phase 4 generation and citations: complete (live OpenRouter verification deferred to final deployment gate by user instruction)
 - Phase 5 evaluation harness: complete (live OpenRouter judge verification deferred to final deployment gate by user instruction)
 - Phase 6 observability: complete
+- Phase 7 drift monitoring: complete
 - Verified on 2026-04-14:
   - `uv sync`
   - `uv run alembic upgrade head`
@@ -65,6 +66,13 @@
   - `uv run pytest tests/test_health.py tests/test_chunker.py tests/test_embedder.py tests/test_documents.py tests/test_bm25.py tests/test_vector.py tests/test_fusion.py tests/test_reranker.py tests/test_search_endpoint.py tests/test_citation_extractor.py tests/test_answer_endpoint.py tests/test_eval_runner.py tests/test_metrics.py tests/test_tracing_middleware.py -v`
   - ASGI `POST /api/v1/search`
   - ASGI `GET /metrics`
+- Verified on 2026-04-14 for Phase 7:
+  - `uv run alembic upgrade head`
+  - `uv run pytest tests/test_drift_runner.py -v`
+  - `uv run python -m docintel.tools.run_drift --window-days 7 --reference-window-days 7`
+  - ASGI `GET /api/v1/drift/reports`
+  - app lifespan startup showing the registered weekly APScheduler job
+  - `uv run pytest tests/test_health.py tests/test_chunker.py tests/test_embedder.py tests/test_documents.py tests/test_bm25.py tests/test_vector.py tests/test_fusion.py tests/test_reranker.py tests/test_search_endpoint.py tests/test_citation_extractor.py tests/test_answer_endpoint.py tests/test_eval_runner.py tests/test_metrics.py tests/test_tracing_middleware.py tests/test_drift_runner.py -v`
 - Phase 3 benchmark result on seeded fixture:
   - `vector_only`: precision@10 `0.100`, recall@10 `0.500`
   - `hybrid_reranked`: precision@10 `0.150`, recall@10 `0.750`
@@ -81,6 +89,12 @@
   - `/metrics` exposes the required DocIntel collector names
   - tracing middleware adds `X-Request-ID`, records request latency, and increments counters
   - after one real `/api/v1/search`, `/metrics` showed non-zero `docintel_requests_total` entries for the search path
+- Phase 7 drift verification:
+  - migration `005_drift_reports` is applied on the main `docintel` database
+  - the one-shot drift CLI created report `53df52b6-07e9-49b8-8b6a-a213c35e9a37` with status `alert`
+  - HTML artifact persistence is verified at `apps/api/artifacts/drift/53df52b6-07e9-49b8-8b6a-a213c35e9a37.html`
+  - ASGI `GET /api/v1/drift/reports` returned the persisted report with a local `html_url`
+  - app startup logs showed the registered APScheduler job `weekly-drift-report` with the next run at `2026-04-21 02:00:00+00:00`
 - Official AI Act verification ingest:
   - source URL: `https://op.europa.eu/o/opportal-service/download-handler?format=PDF&identifier=dc8116a1-3fe6-11ef-865a-01aa75ed71a1&language=en&productionSystem=cellar`
   - SHA256: `bba630444b3278e881066774002a1d7824308934f49ccfa203e65be43692f55e`
@@ -91,6 +105,7 @@
 - Host-side `localhost:8000` access from Windows remained unreliable after Docker recovery even while the container served healthy responses internally
 - Per user direction on 2026-04-14, Docker host-port verification is no longer a phase-by-phase gate and will be revisited during final deployment/hardening
 - Per user direction on 2026-04-14, OpenRouter-backed live verification for `/api/v1/answer` and later eval flows is deferred to the final deployment/hardening gate; intermediate phase closure may proceed on passing local tests and stubbed provider integration checks
+- The local `docintel` database initially had current-window traffic but no prior 7-day reference traffic on 2026-04-14, so Phase 7 verification seeded deterministic historical query/retrieval windows in the local DB before running the one-shot drift CLI
 - The Phase 3 benchmark CLI seeds and then cleans up a deterministic fixture so retrieval benchmarking stays repeatable without polluting the live corpus
 
 ## Update Rule

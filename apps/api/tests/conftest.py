@@ -69,6 +69,7 @@ async def postgres_db_session(postgres_engine):
     async with postgres_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.execute(text("DROP TYPE IF EXISTS document_status CASCADE"))
+        await conn.execute(text("DROP TYPE IF EXISTS drift_status CASCADE"))
         await conn.execute(text("DROP TYPE IF EXISTS retrieval_strategy CASCADE"))
         await conn.execute(text("DROP TYPE IF EXISTS eval_run_status CASCADE"))
         await conn.run_sync(Base.metadata.create_all)
@@ -80,6 +81,7 @@ async def postgres_db_session(postgres_engine):
     async with postgres_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.execute(text("DROP TYPE IF EXISTS document_status CASCADE"))
+        await conn.execute(text("DROP TYPE IF EXISTS drift_status CASCADE"))
         await conn.execute(text("DROP TYPE IF EXISTS retrieval_strategy CASCADE"))
         await conn.execute(text("DROP TYPE IF EXISTS eval_run_status CASCADE"))
 

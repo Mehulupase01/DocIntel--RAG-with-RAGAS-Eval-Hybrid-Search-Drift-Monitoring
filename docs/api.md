@@ -86,3 +86,24 @@ Returns one evaluation run by id.
 ## `GET /api/v1/eval/runs/{id}/cases`
 
 Returns paginated evaluation cases for a run. Supports `page`, `per_page`, and optional `passed`.
+
+## `POST /api/v1/drift/reports`
+
+Generates a one-shot Evidently drift report comparing the current window against the prior reference window and returns the persisted report metadata.
+
+Example request:
+
+```json
+{
+  "window_days": 7,
+  "reference_window_days": 7
+}
+```
+
+## `GET /api/v1/drift/reports`
+
+Returns paginated drift reports. Supports `page`, `per_page`, and optional `status`.
+
+## `GET /api/v1/drift/reports/{id}`
+
+Returns one drift report by id, including the local `html_url` for the saved artifact.

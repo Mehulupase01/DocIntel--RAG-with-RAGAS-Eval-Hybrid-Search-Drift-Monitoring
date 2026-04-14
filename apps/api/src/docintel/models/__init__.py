@@ -7,6 +7,7 @@ from .citation import Citation
 from .document import Document, DocumentStatus
 from .eval_case import EvalCase
 from .eval_run import EvalRun, EvalRunStatus
+from .drift_report import DriftReport, DriftStatus
 from .query import Query, RetrievalStrategy
 from .retrieval import Retrieval
 
@@ -17,6 +18,8 @@ __all__ = [
     "Chunk",
     "Document",
     "DocumentStatus",
+    "DriftReport",
+    "DriftStatus",
     "EMBEDDING_DIM",
     "EvalCase",
     "EvalRun",

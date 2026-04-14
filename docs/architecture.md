@@ -98,3 +98,16 @@
   - LLM cost totals
   - latest eval aggregate scores
 - LangSmith remains optional and no-op when its env vars are absent.
+
+## Current Drift State
+- Verified on 2026-04-14: the drift domain is implemented with:
+  - persisted `drift_reports`
+  - an Evidently report over query embeddings plus query/retrieval feature drift
+  - HTML artifact persistence under `apps/api/artifacts/drift/`
+  - read-only `/api/v1/drift/reports` endpoints and a one-shot CLI entrypoint
+  - an APScheduler weekly cron job registered at app startup
+- Current drift status evaluation uses:
+  - `embedding_drift_score`
+  - `query_drift_score` as Evidently feature-drift share
+  - `retrieval_quality_delta`
+  - rank-stability delta retained in `payload_json`
