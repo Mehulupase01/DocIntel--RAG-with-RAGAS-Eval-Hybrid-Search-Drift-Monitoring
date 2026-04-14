@@ -48,3 +48,9 @@
 | Drift Module | Evidently reporting, weekly scheduler, persistence | evidently 0.6.7, APScheduler 3.11.0 |
 | ORM / DB | Async persistence and migrations | SQLAlchemy 2.0.48, Alembic 1.18.4 |
 | Dashboard | Read-only ops UI | Streamlit 1.45.0 |
+
+## Current Corpus State
+- Verified on 2026-04-14: the official English EU AI Act PDF is ingested into the local `docintel` database.
+- Source URL: `https://op.europa.eu/o/opportal-service/download-handler?format=PDF&identifier=dc8116a1-3fe6-11ef-865a-01aa75ed71a1&language=en&productionSystem=cellar`
+- Stored document id: `106ea9d5-f534-4620-873f-68ff43cabf72`
+- Corpus stats from the verified ingest: `144` pages, `331` chunks

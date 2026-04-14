@@ -7,6 +7,7 @@ from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from docintel.config import get_settings
+from docintel.models import Chunk, Document  # noqa: F401
 from docintel.models.base import Base
 
 config = context.config

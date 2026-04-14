@@ -4,7 +4,7 @@
 |---|---|---|
 | Phase 0 - Blueprint | Complete | `BLUEPRINT.md` is the authoritative architecture source. |
 | Phase 1 - Foundation | Complete | FastAPI foundation, async DB layer, Alembic baseline, tests, Docker assets, Docker storage migration to `D:`, and continuity docs are in place. Core verification commands passed on 2026-04-14. |
-| Phase 2 - Ingestion Pipeline | Not Started | Next phase. |
+| Phase 2 - Ingestion Pipeline | Complete | Documents/chunks models, migration 002, ingestion services, `/documents` routes, CLI ingest, tests, and a verified official EU AI Act ingest (`144` pages, `331` chunks) are complete as of 2026-04-14. |
 | Phase 3 - Retrieval Layer | Not Started | Blocked until prior phases close. |
 | Phase 4 - Generation & Citations | Not Started | Requires `OPENROUTER_API_KEY`. |
 | Phase 5 - Evaluation Harness | Not Started | Requires `OPENROUTER_API_KEY`; 25-case v0.1 fixture approved. |

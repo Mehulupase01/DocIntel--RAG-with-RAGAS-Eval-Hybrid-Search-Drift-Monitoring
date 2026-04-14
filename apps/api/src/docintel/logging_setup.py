@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import sys
 from typing import Any
 
 import structlog
@@ -24,6 +25,8 @@ def configure_logging(settings: Settings | None = None) -> None:
     log_level = getattr(logging, log_level_name, logging.INFO)
     renderer: structlog.types.Processor
     if resolved_settings and resolved_settings.log_format == "console":
+        if hasattr(sys.stdout, "reconfigure"):
+            sys.stdout.reconfigure(encoding="utf-8", errors="backslashreplace")
         renderer = structlog.dev.ConsoleRenderer()
     else:
         renderer = structlog.processors.JSONRenderer()
@@ -44,11 +47,10 @@ def configure_logging(settings: Settings | None = None) -> None:
         ],
         wrapper_class=structlog.make_filtering_bound_logger(log_level),
         context_class=dict,
-        logger_factory=structlog.PrintLoggerFactory(),
+        logger_factory=structlog.WriteLoggerFactory(file=sys.stdout),
         cache_logger_on_first_use=True,
     )
 
 
 def get_logger(*args: Any, **kwargs: Any) -> structlog.stdlib.BoundLogger:
     return structlog.get_logger(*args, **kwargs)
-

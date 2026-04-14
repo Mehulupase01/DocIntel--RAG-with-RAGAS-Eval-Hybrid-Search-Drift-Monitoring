@@ -10,8 +10,8 @@ from .config import Settings, get_settings
 
 
 async def require_api_key(
+    settings: Annotated[Settings, Depends(get_settings)],
     x_api_key: Annotated[str | None, Header(alias="X-API-Key")] = None,
-    settings: Annotated[Settings, Depends(get_settings)] = Depends(get_settings),
 ) -> None:
     if not settings.api_keys:
         raise HTTPException(
