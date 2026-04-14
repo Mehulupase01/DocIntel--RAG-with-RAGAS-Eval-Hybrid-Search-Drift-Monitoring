@@ -27,7 +27,6 @@
   - a fresh API image rebuild (`docker build apps/api` or `docker compose ... up -d --build`) still timed out after 60 minutes on this Windows Docker Desktop machine even after the CPU-only torch pin, lazy eval imports, and app-scoped Docker contexts
 
 ## Next Step
-- Push the current Phase 9 hardening work to `main`.
 - Run `gh workflow run ci.yml --ref main` and confirm it goes green on GitHub.
 - Add repo secret `OPENROUTER_API_KEY`, then re-run `gh workflow run ragas-eval.yml --ref main`.
 - Re-verify the prod overlay on a stable Docker host or after resolving the local Docker Desktop API image rebuild/export bottleneck.
