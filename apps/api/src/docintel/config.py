@@ -26,8 +26,8 @@ class Settings(BaseSettings):
 
     openrouter_api_key: str | None = None
     openrouter_base_url: str = "https://openrouter.ai/api/v1"
-    default_generation_model: str = "anthropic/claude-haiku-4-5"
-    default_judge_model: str = "openai/gpt-4o-mini"
+    default_generation_model: str = "minimax/minimax-m2.5:free"
+    default_judge_model: str = "nvidia/nemotron-3-super-120b-a12b:free"
 
     langsmith_api_key: str | None = None
     langsmith_project: str = "docintel-dev"

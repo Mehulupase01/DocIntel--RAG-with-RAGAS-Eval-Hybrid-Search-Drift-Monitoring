@@ -12,7 +12,7 @@ from docintel.schemas.eval import EvalRunCreate
 from docintel.schemas.search import RetrievedChunk
 from docintel.services.evaluation import ci_gate
 from docintel.services.evaluation.fixture_loader import FixtureSuite, FixtureValidationError, load_fixture
-from docintel.services.evaluation.ragas_runner import EvalRunResult, run_eval_suite
+from docintel.services.evaluation.ragas_runner import EvalRunResult, _LocalSentenceTransformerEmbeddings, run_eval_suite
 from docintel.services.evaluation.thresholds import EvalScores
 from docintel.services.generation.answerer import AnswerResult
 from sqlalchemy import func, select
@@ -99,6 +99,19 @@ async def _stub_answer_generator(*, session, request):
         cost_usd=0.0,
         latency_ms=10,
     )
+
+
+def test_local_sentence_transformer_embeddings_adapter(monkeypatch):
+    class _StubEmbedder:
+        def embed_texts(self, texts):
+            return [[float(index + 1)] * 3 for index, _text in enumerate(texts)]
+
+    monkeypatch.setattr("docintel.services.evaluation.ragas_runner.get_embedder", lambda: _StubEmbedder())
+
+    embeddings = _LocalSentenceTransformerEmbeddings()
+
+    assert embeddings.embed_query("one") == [1.0, 1.0, 1.0]
+    assert embeddings.embed_documents(["one", "two"]) == [[1.0, 1.0, 1.0], [2.0, 2.0, 2.0]]
 
 
 def test_fixture_loader_validates_schema(tmp_path: Path):

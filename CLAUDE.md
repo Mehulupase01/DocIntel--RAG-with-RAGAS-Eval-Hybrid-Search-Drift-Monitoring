@@ -23,7 +23,7 @@
 - Embeddings: `BAAI/bge-small-en-v1.5` (384-dim); reranker: `cross-encoder/ms-marco-MiniLM-L-6-v2`
 - BM25 via Postgres `tsvector` + GIN; vector via pgvector HNSW (cosine)
 - Fusion: Reciprocal Rank Fusion (`k=60`)
-- LLM: OpenRouter; default generation `anthropic/claude-haiku-4-5`, judge `openai/gpt-4o-mini`
+- LLM: OpenRouter; default generation `minimax/minimax-m2.5:free`, judge `nvidia/nemotron-3-super-120b-a12b:free`
 - Eval: RAGAS faithfulness/context_precision/context_recall/answer_relevancy with CI gate
 - Drift: Evidently weekly job via APScheduler
 
@@ -91,14 +91,18 @@
 - Phase 4 generation verification:
   - `/api/v1/answer` contract, persistence, citation extraction, and upstream-error handling are covered by stubbed integration tests
   - `queries`, `retrievals`, `answers`, and `citations` persistence is verified in Postgres-backed tests
+  - live `/api/v1/answer` attempt with the requested default generation model `minimax/minimax-m2.5:free` returned an upstream provider-limit error on 2026-04-14 (`429 Provider returned error`)
+  - live `/api/v1/answer` retry with a request-level override to `nvidia/nemotron-3-super-120b-a12b:free` returned `200` against the real EU AI Act corpus on 2026-04-14, proving the live answer path works end to end when the provider accepts the request
 - Phase 5 evaluation verification:
   - fixture schema validation, eval persistence, endpoint pagination, and CI gate exit behavior are covered by `tests/test_eval_runner.py`
   - `fixtures/eu_ai_act_qa_v1.json` now ships `25` reviewed seed cases tagged as fixture version `v0.1`
   - `.github/workflows/ragas-eval.yml` is authored for PR gating and awaits final live secret-backed verification
+  - live judge smoke with `nvidia/nemotron-3-super-120b-a12b:free` now uses the local sentence-transformer embeddings path instead of a hidden OpenAI embedding default, but the provider returned `524 Provider returned error` for the RAGAS metric prompts on 2026-04-14
 - Phase 6 observability verification:
   - `/metrics` exposes the required DocIntel collector names
   - tracing middleware adds `X-Request-ID`, records request latency, and increments counters
   - after one real `/api/v1/search`, `/metrics` showed non-zero `docintel_requests_total` entries for the search path
+  - LangSmith tracing is confirmed locally with `LANGSMITH_TRACING=true`: startup logs show `docintel.langsmith enabled=True`, and the EU LangSmith project `docintel-dev` contains recent runs from the live judge smoke (including `ChatOpenAI` error traces and pending RAGAS chains)
 - Phase 7 drift verification:
   - migration `005_drift_reports` is applied on the main `docintel` database
   - the one-shot drift CLI created report `53df52b6-07e9-49b8-8b6a-a213c35e9a37` with status `alert`
@@ -121,10 +125,11 @@
   - `docker build -t docintel-dashboard:test apps/dashboard`
   - `docker compose -f docker-compose.yml -f docker-compose.prod.yml config`
 - Phase 9 blocker state:
-  - `gh secret list` currently shows no configured repository secrets, so live `ragas-eval` verification still needs `OPENROUTER_API_KEY`
+  - `gh secret list` currently shows no configured repository secrets, so GitHub-hosted live `ragas-eval` verification still needs `OPENROUTER_API_KEY` to be uploaded as a repo secret if the user approves that step
   - `gh workflow run ci.yml --ref main` passed on GitHub run `24394769593`
   - `gh workflow run ragas-eval.yml --ref main` failed fast on the explicit missing-secret preflight in GitHub run `24393783852`
   - the dashboard image now rebuilds cleanly from the app-scoped Docker context, but a fresh API image rebuild (`docker build apps/api` or `docker compose ... up -d --build`) still timed out after 60 minutes on this Windows Docker Desktop host even after the CPU-only torch pin and Docker context reductions
+  - the user-selected free OpenRouter defaults are not yet both provider-stable in live verification on 2026-04-14: `minimax/minimax-m2.5:free` returned provider-limit `429` on generation, and `nvidia/nemotron-3-super-120b-a12b:free` returned provider timeout `524` on RAGAS judge prompts
 - Official AI Act verification ingest:
   - source URL: `https://op.europa.eu/o/opportal-service/download-handler?format=PDF&identifier=dc8116a1-3fe6-11ef-865a-01aa75ed71a1&language=en&productionSystem=cellar`
   - SHA256: `bba630444b3278e881066774002a1d7824308934f49ccfa203e65be43692f55e`

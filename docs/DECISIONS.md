@@ -23,6 +23,8 @@
 | D-017 | Default generation model: `anthropic/claude-haiku-4-5` | `claude-sonnet-4-6`, `gpt-4o-mini`, `gpt-4o` | Best speed/quality/cost for citation-grounded regulatory answers; confirmed by user 2026-04-13 |
 | D-018 | Default judge model: `openai/gpt-4o-mini` (via OpenRouter) | `gpt-4o`, `claude-haiku-4-5`, `claude-sonnet-4-6` | RAGAS prompts are OpenAI-tuned; mini keeps CI cost bounded; confirmed by user 2026-04-13 |
 | D-019 | API key (`X-API-Key`) is the committed v1 auth scheme | JWT Bearer, no-auth | Ops/dashboard/CI use; JWT is a cheap future migration when a public web UI is added; confirmed by user 2026-04-13 |
+| D-020 | Default generation model: `minimax/minimax-m2.5:free` (via OpenRouter) | Keep `anthropic/claude-haiku-4-5`; choose a paid frontier default | User explicitly changed the default on 2026-04-14 to a free OpenRouter model for live generation verification and ongoing project defaults |
+| D-021 | Default judge model: `nvidia/nemotron-3-super-120b-a12b:free` (via OpenRouter) | Keep `openai/gpt-4o-mini`; use a paid judge model | User explicitly changed the default on 2026-04-14 to a free OpenRouter model for live evaluation verification and ongoing project defaults |
 
 ## Execution Notes
 - Phase 1 dependency pin validation completed locally on 2026-04-13 and surfaced a resolver conflict between `pytest==9.0.2` and `pytest-asyncio==1.0.0` because `pytest-asyncio` pins `pytest<9`.
@@ -53,4 +55,6 @@
 - Phase 9 also switches both runtime images to `COPY --chown=app:app` so ownership is applied during the copy step instead of via a recursive `chown -R`, which is especially expensive on this Docker Desktop setup.
 - Phase 9 further aligns the packaging with the blueprint by pinning `torch` to the explicit PyTorch CPU wheel index. `uv lock --directory apps/api` now resolves `torch==2.6.0+cpu` and removes the unused CUDA/triton packages from fresh installs.
 - Phase 9 also defers `ragas` imports until eval execution time and installs `git` in the API runtime image. This keeps the main FastAPI app startup path from crashing on container boot while preserving the real RAGAS implementation for eval runs.
+- On 2026-04-14, the user explicitly changed the default OpenRouter models to `minimax/minimax-m2.5:free` for generation and `nvidia/nemotron-3-super-120b-a12b:free` for judging. The tracked config and env example now reflect those defaults.
+- Live verification on 2026-04-14 showed provider-specific limits for those free models: `minimax/minimax-m2.5:free` returned provider-limit `429` on generation requests, while `nvidia/nemotron-3-super-120b-a12b:free` succeeded as a request-level `/answer` override but returned provider timeout `524` on RAGAS judge prompts. LangSmith traces for the failed judge smoke were observed in the EU LangSmith project `docintel-dev`.
 - On 2026-04-14, `gh secret list` for `Mehulupase01/DocIntel--RAG-with-RAGAS-Eval-Hybrid-Search-Drift-Monitoring` returned no configured repository secrets. Live `ragas-eval` verification therefore remains blocked until `OPENROUTER_API_KEY` is added.

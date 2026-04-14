@@ -25,7 +25,7 @@ Example request:
   "query": "Define high-risk AI system per the EU AI Act",
   "top_k": 6,
   "strategy": "hybrid_reranked",
-  "model": "anthropic/claude-haiku-4-5",
+  "model": "minimax/minimax-m2.5:free",
   "temperature": 0.0,
   "max_tokens": 1024
 }
@@ -51,10 +51,10 @@ Example response shape:
     }
   ],
   "contexts": [],
-  "model": "anthropic/claude-haiku-4-5",
+  "model": "minimax/minimax-m2.5:free",
   "prompt_tokens": 123,
   "completion_tokens": 45,
-  "cost_usd": 0.000348,
+  "cost_usd": 0.0,
   "latency_ms": 812
 }
 ```
@@ -69,8 +69,8 @@ Example request:
 {
   "suite_version": "v1",
   "retrieval_strategy": "hybrid_reranked",
-  "generation_model": "anthropic/claude-haiku-4-5",
-  "judge_model": "openai/gpt-4o-mini",
+  "generation_model": "minimax/minimax-m2.5:free",
+  "judge_model": "nvidia/nemotron-3-super-120b-a12b:free",
   "fail_fast": false
 }
 ```

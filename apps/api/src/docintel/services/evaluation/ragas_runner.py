@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import subprocess
 import uuid
 from dataclasses import dataclass
@@ -7,6 +8,7 @@ from datetime import datetime, timezone
 from statistics import mean
 from typing import Protocol, cast
 
+from langchain_core.embeddings import Embeddings
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from docintel.config import get_settings
@@ -18,6 +20,7 @@ from docintel.services.evaluation.fixture_loader import FixtureSuite, load_fixtu
 from docintel.services.evaluation.thresholds import EvalScores, EvalThresholds, case_passes, get_eval_thresholds
 from docintel.services.generation.answerer import AnswerResult, answer_question
 from docintel.services.generation.llm_client import LLMProviderNotConfiguredError
+from docintel.services.ingestion.embedder import get_embedder
 from docintel.services.monitoring.metrics import record_eval_scores
 
 
@@ -53,6 +56,23 @@ class EvalRunResult:
     answer_relevancy_mean: float | None
 
 
+class _LocalSentenceTransformerEmbeddings(Embeddings):
+    def __init__(self) -> None:
+        self.model = get_settings().embedding_model
+
+    def embed_documents(self, texts: list[str]) -> list[list[float]]:
+        return get_embedder().embed_texts(texts)
+
+    def embed_query(self, text: str) -> list[float]:
+        return get_embedder().embed_texts([text])[0]
+
+    async def aembed_documents(self, texts: list[str]) -> list[list[float]]:
+        return await asyncio.to_thread(self.embed_documents, texts)
+
+    async def aembed_query(self, text: str) -> list[float]:
+        return await asyncio.to_thread(self.embed_query, text)
+
+
 class RagasJudgeScorer:
     def __init__(self, judge_model: str) -> None:
         settings = get_settings()
@@ -70,6 +90,7 @@ class RagasJudgeScorer:
             max_retries=2,
         )
         self._llm = LangchainLLMWrapper(chat_model)
+        self._embeddings = _LocalSentenceTransformerEmbeddings()
 
     async def score(
         self,
@@ -97,6 +118,7 @@ class RagasJudgeScorer:
             dataset=dataset,
             metrics=[faithfulness, context_precision, context_recall, answer_relevancy],
             llm=self._llm,
+            embeddings=self._embeddings,
             raise_exceptions=True,
             show_progress=False,
             return_executor=False,

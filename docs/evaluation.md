@@ -15,7 +15,7 @@ Per-case pass requires all four metrics to meet or exceed their thresholds.
 - Current case count: `25`
 
 ## Judge Model
-- Default judge model: `openai/gpt-4o-mini`
+- Default judge model: `nvidia/nemotron-3-super-120b-a12b:free`
 - Transport: OpenRouter via `OPENROUTER_BASE_URL`
 
 ## Commands

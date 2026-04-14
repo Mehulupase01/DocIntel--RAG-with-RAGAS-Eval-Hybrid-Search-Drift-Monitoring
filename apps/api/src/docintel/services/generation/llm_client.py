@@ -14,6 +14,8 @@ KNOWN_MODEL_PRICING_USD_PER_1M_TOKENS: dict[str, dict[str, float]] = {
     "anthropic/claude-haiku-4-5": {"input": 1.0, "output": 5.0},
     "anthropic/claude-haiku-4.5": {"input": 1.0, "output": 5.0},
     "openai/gpt-4o-mini": {"input": 0.15, "output": 0.60},
+    "minimax/minimax-m2.5:free": {"input": 0.0, "output": 0.0},
+    "nvidia/nemotron-3-super-120b-a12b:free": {"input": 0.0, "output": 0.0},
 }
 
 RETRYABLE_STATUS_CODES = {408, 429, 500, 502, 503, 504}
@@ -88,6 +90,13 @@ class OpenRouterClient:
                 response.raise_for_status()
                 latency_ms = int((perf_counter() - start) * 1000)
                 data = response.json()
+                provider_error = _extract_provider_error(data)
+                if provider_error is not None:
+                    code, message = provider_error
+                    if code in RETRYABLE_STATUS_CODES and attempt < self.max_retries:
+                        await asyncio.sleep(0.5 * attempt)
+                        continue
+                    raise LLMProviderError(f"OpenRouter provider error {code}: {message}")
                 return self._parse_response(data, requested_model=model, latency_ms=latency_ms)
             except (httpx.HTTPError, ValueError) as exc:
                 last_error = exc
@@ -132,6 +141,19 @@ def _extract_text_content(content: Any) -> str:
         text_parts = [str(item.get("text", "")) for item in content if isinstance(item, dict) and item.get("type") == "text"]
         return "\n".join(part for part in text_parts if part).strip()
     raise LLMProviderError("OpenRouter response content was not a string or text-part list")
+
+
+def _extract_provider_error(data: dict[str, Any]) -> tuple[int | None, str] | None:
+    error = data.get("error")
+    if not isinstance(error, dict):
+        return None
+    code = error.get("code")
+    message = str(error.get("message") or "Provider returned an unknown error")
+    try:
+        parsed_code = int(code) if code is not None else None
+    except (TypeError, ValueError):
+        parsed_code = None
+    return parsed_code, message
 
 
 def _estimate_cost_usd(model: str, prompt_tokens: int, completion_tokens: int) -> float:

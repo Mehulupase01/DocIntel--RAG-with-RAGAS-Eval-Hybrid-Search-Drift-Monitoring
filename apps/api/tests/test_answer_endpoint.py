@@ -105,7 +105,7 @@ def _success_transport() -> httpx.MockTransport:
             200,
             json={
                 "id": "gen-1",
-                "model": "anthropic/claude-haiku-4-5",
+                "model": "minimax/minimax-m2.5:free",
                 "choices": [
                     {
                         "index": 0,
@@ -124,6 +124,34 @@ def _success_transport() -> httpx.MockTransport:
         )
 
     return httpx.MockTransport(handler)
+
+
+def _provider_error_transport() -> httpx.MockTransport:
+    def handler(_request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200,
+            json={
+                "error": {
+                    "message": "Provider returned error",
+                    "code": 429,
+                }
+            },
+        )
+
+    return httpx.MockTransport(handler)
+
+
+@pytest.mark.asyncio
+async def test_openrouter_client_raises_on_provider_error_payload():
+    async with httpx.AsyncClient(transport=_provider_error_transport(), base_url="https://openrouter.ai/api/v1") as http_client:
+        client = OpenRouterClient(api_key="test-key", http_client=http_client, max_retries=1)
+        with pytest.raises(LLMProviderError, match="provider error 429"):
+            await client.generate(
+                messages=[{"role": "user", "content": "ping"}],
+                model="minimax/minimax-m2.5:free",
+                temperature=0.0,
+                max_tokens=16,
+            )
 
 
 @pytest.mark.asyncio
@@ -150,7 +178,7 @@ async def test_answer_endpoint_returns_citations_with_chunk_metadata(postgres_cl
     assert body["citations"][0]["document_title"] == "Seed Document"
     assert body["citations"][0]["section_path"] == "Article 6"
     assert body["contexts"][0]["chunk_id"] == str(chunks[0].id)
-    assert body["model"] == "anthropic/claude-haiku-4-5"
+    assert body["model"] == "minimax/minimax-m2.5:free"
     assert body["prompt_tokens"] == 123
     assert body["completion_tokens"] == 45
 

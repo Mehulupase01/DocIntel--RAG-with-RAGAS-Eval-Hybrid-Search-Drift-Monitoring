@@ -34,7 +34,7 @@ This repository answers those questions with one modular monolith:
 | Drift | Persisted drift report `53df52b6-07e9-49b8-8b6a-a213c35e9a37` with HTML artifact output |
 | GitHub Actions | `ci.yml` passed on GitHub run `24394769593` |
 | Compose validation | `docker compose -f docker-compose.yml -f docker-compose.prod.yml config` passes |
-| Final live blockers | Repo has no GitHub secrets configured; `OPENROUTER_API_KEY` is still required for live `/answer`, live eval, and the `ragas-eval` workflow |
+| Final live blockers | GitHub still has no repo secrets configured; local live checks also show provider instability for the chosen free-model defaults (`MiniMax 429`, `Nemotron judge 524`) |
 
 ## System Overview
 
@@ -194,7 +194,9 @@ These are the remaining non-code blockers as of 2026-04-14:
 - GitHub repo secret inventory is currently empty from the authenticated CLI view
 - `docker build -t docintel-dashboard:test apps/dashboard` now succeeds locally from the app-scoped build context
 - a fresh API image rebuild on this Windows Docker Desktop host still times out after 60 minutes even after the CPU-only torch pin and build-context reductions
-- live OpenRouter-backed `/api/v1/answer` and full end-to-end eval verification remain deferred until that secret is provided
+- local live `/api/v1/answer` with the requested default `minimax/minimax-m2.5:free` currently returns provider-limit `429`
+- local live `/api/v1/answer` with request override `nvidia/nemotron-3-super-120b-a12b:free` succeeds
+- local live RAGAS judge verification with `nvidia/nemotron-3-super-120b-a12b:free` reaches LangSmith but currently returns provider timeout `524`
 
 ## Docs
 
