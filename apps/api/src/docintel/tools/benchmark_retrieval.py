@@ -16,7 +16,6 @@ from docintel.models.document import Document, DocumentStatus
 from docintel.models.query import Query, RetrievalStrategy
 from docintel.services.retrieval.hybrid import hybrid_search
 
-
 BENCHMARK_SOURCE_URI = "benchmark://phase3-retrieval-fixture"
 
 

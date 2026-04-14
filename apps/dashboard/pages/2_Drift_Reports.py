@@ -3,9 +3,8 @@ from __future__ import annotations
 from pathlib import Path
 
 import streamlit as st
-from streamlit.components.v1 import html
-
 from lib.db import fetch_drift_reports
+from streamlit.components.v1 import html
 
 
 def _format_decimal(value) -> str:

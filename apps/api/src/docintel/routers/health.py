@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Annotated
+from typing import Annotated, cast
 
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
@@ -27,15 +27,21 @@ async def readiness(
         await db.execute(text("SELECT 1"))
         vector_extension = await check_vector_extension(db)
     except Exception:
-        return JSONResponse(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            content={"status": "error", "db": "disconnected", "vector_extension": False},
+        return cast(
+            dict[str, str | bool],
+            JSONResponse(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                content={"status": "error", "db": "disconnected", "vector_extension": False},
+            ),
         )
 
     if not vector_extension:
-        return JSONResponse(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            content={"status": "error", "db": "connected", "vector_extension": False},
+        return cast(
+            dict[str, str | bool],
+            JSONResponse(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                content={"status": "error", "db": "connected", "vector_extension": False},
+            ),
         )
 
     return {"status": "ok", "db": "connected", "vector_extension": True}

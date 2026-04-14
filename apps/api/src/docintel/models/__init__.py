@@ -2,12 +2,12 @@
 
 from .answer import Answer
 from .base import Base
-from .chunk import Chunk, EMBEDDING_DIM
+from .chunk import EMBEDDING_DIM, Chunk
 from .citation import Citation
 from .document import Document, DocumentStatus
+from .drift_report import DriftReport, DriftStatus
 from .eval_case import EvalCase
 from .eval_run import EvalRun, EvalRunStatus
-from .drift_report import DriftReport, DriftStatus
 from .query import Query, RetrievalStrategy
 from .retrieval import Retrieval
 

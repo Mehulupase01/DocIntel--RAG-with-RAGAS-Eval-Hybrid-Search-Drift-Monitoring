@@ -6,8 +6,6 @@ import uuid
 from pathlib import Path
 
 import pytest
-from sqlalchemy import func, select
-
 from docintel.models.eval_case import EvalCase
 from docintel.models.eval_run import EvalRun, EvalRunStatus
 from docintel.schemas.eval import EvalRunCreate
@@ -17,6 +15,7 @@ from docintel.services.evaluation.fixture_loader import FixtureSuite, FixtureVal
 from docintel.services.evaluation.ragas_runner import EvalRunResult, run_eval_suite
 from docintel.services.evaluation.thresholds import EvalScores
 from docintel.services.generation.answerer import AnswerResult
+from sqlalchemy import func, select
 
 
 def _fixture_suite() -> FixtureSuite:

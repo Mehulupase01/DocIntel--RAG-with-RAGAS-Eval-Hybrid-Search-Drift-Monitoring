@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import numpy as np
-
 from docintel.services.ingestion.embedder import get_embedder
 
 

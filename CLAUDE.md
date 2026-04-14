@@ -37,6 +37,7 @@
 - Phase 6 observability: complete
 - Phase 7 drift monitoring: complete
 - Phase 8 streamlit dashboard: complete
+- Phase 9 hardening: in progress
 - Verified on 2026-04-14:
   - `uv sync`
   - `uv run alembic upgrade head`
@@ -108,6 +109,17 @@
   - dashboard helper tests cover KPI, eval, drift, cost, latency, and model-breakdown query shapes
   - Streamlit `AppTest` successfully rendered `app.py`, `1_Eval_Trends.py`, `2_Drift_Reports.py`, `3_Cost_and_Latency.py`, and `4_Retrieval_Explorer.py`
   - `ops/docker/compose.full.yml` validates cleanly and supplies the dashboard service on port `8501`
+- Phase 9 hardening verification:
+  - `uvx --from ruff==0.15.7 ruff check apps/api/src apps/api/tests apps/dashboard`
+  - `uv run --directory apps/api --with mypy==1.18.2 mypy --config-file ../../mypy.ini src`
+  - `uv run --directory apps/dashboard --with mypy==1.18.2 mypy --config-file ../../mypy.ini app.py lib pages`
+  - `uv run --directory apps/api pytest tests -v`
+  - `uv run --directory apps/dashboard pytest tests/test_db_queries.py -v`
+  - `uv run --directory apps/dashboard python -m compileall app.py lib pages tests`
+  - `docker compose -f docker-compose.yml -f docker-compose.prod.yml config`
+- Phase 9 blocker state:
+  - `gh secret list` currently shows no configured repository secrets, so live `ragas-eval` verification still needs `OPENROUTER_API_KEY`
+  - local prod-overlay Docker bring-up reaches `db` and `api`, but the dashboard image export/build path remains unreliable on this Windows Docker Desktop host even after Dockerfile and `.dockerignore` hardening
 - Official AI Act verification ingest:
   - source URL: `https://op.europa.eu/o/opportal-service/download-handler?format=PDF&identifier=dc8116a1-3fe6-11ef-865a-01aa75ed71a1&language=en&productionSystem=cellar`
   - SHA256: `bba630444b3278e881066774002a1d7824308934f49ccfa203e65be43692f55e`

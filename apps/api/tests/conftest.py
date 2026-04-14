@@ -16,9 +16,9 @@ TEST_POSTGRES_DB_URL = "postgresql+asyncpg://postgres:postgres@localhost:5432/do
 os.environ.setdefault("DATABASE_URL", TEST_DB_URL)
 os.environ.setdefault("API_KEYS", "dev-key-change-me")
 
-from docintel.database import get_db
-from docintel.main import app
-from docintel.models.base import Base
+from docintel.database import get_db  # noqa: E402
+from docintel.main import app  # noqa: E402
+from docintel.models.base import Base  # noqa: E402
 
 
 @pytest_asyncio.fixture

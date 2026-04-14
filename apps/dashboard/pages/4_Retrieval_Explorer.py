@@ -3,7 +3,6 @@ from __future__ import annotations
 import httpx
 import pandas as pd
 import streamlit as st
-
 from lib.api_client import SEARCH_STRATEGIES, run_search_matrix
 
 st.title("Retrieval Explorer")

@@ -122,3 +122,21 @@
   - DB-helper tests in `apps/dashboard/tests/test_db_queries.py`
   - Streamlit `AppTest` smoke rendering for every page script
   - `docker compose ... config` validation for the full-stack overlay
+
+## Current Hardening State
+- Verified on 2026-04-14: Phase 9 hardening adds:
+  - production-shaped API and dashboard Dockerfiles
+  - `docker-compose.prod.yml`
+  - `.github/workflows/ci.yml`
+  - a finalized `ragas-eval.yml` with model-cache support and an explicit secret preflight
+  - a root `mypy.ini`
+  - expanded public README and deployment/release documentation
+- Local hardening verification currently includes:
+  - Ruff clean
+  - mypy clean
+  - full API test suite pass
+  - dashboard test and compile pass
+  - `docker compose -f docker-compose.yml -f docker-compose.prod.yml config` pass
+- Remaining final-live blockers:
+  - GitHub repo secrets are currently absent, so the live OpenRouter-backed workflow gate is not yet runnable
+  - local Docker Desktop still struggles to fully export the dashboard image reliably under the prod overlay even after Dockerfile and build-context optimizations

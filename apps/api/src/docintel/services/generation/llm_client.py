@@ -10,7 +10,6 @@ import httpx
 
 from docintel.config import get_settings
 
-
 KNOWN_MODEL_PRICING_USD_PER_1M_TOKENS: dict[str, dict[str, float]] = {
     "anthropic/claude-haiku-4-5": {"input": 1.0, "output": 5.0},
     "anthropic/claude-haiku-4.5": {"input": 1.0, "output": 5.0},

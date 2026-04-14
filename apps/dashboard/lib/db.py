@@ -200,7 +200,7 @@ def fetch_latency_summary(*, engine: Engine | None = None, days: int = 30, now: 
         resolved_engine,
     )
 
-    rows: list[dict[str, float | int | str]] = []
+    rows: list[dict[str, float | int | str | None]] = []
     for endpoint, frame in (("/api/v1/search", search_frame), ("/api/v1/answer", answer_frame)):
         if frame.empty:
             continue

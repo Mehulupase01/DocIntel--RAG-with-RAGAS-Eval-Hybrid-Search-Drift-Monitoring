@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import uuid
-from typing import Annotated
+from typing import Annotated, cast
 
 from fastapi import APIRouter, Depends, File, Form, Query, Response, UploadFile, status
 from fastapi.responses import JSONResponse
@@ -148,9 +148,15 @@ async def reingest_document(
 ) -> dict[str, str]:
     document = await db.get(Document, document_id)
     if document is None:
-        return _error_response(status.HTTP_404_NOT_FOUND, "NOT_FOUND", "Document not found")
+        return cast(
+            dict[str, str],
+            _error_response(status.HTTP_404_NOT_FOUND, "NOT_FOUND", "Document not found"),
+        )
     if document.status == DocumentStatus.INGESTING:
-        return _error_response(status.HTTP_409_CONFLICT, "DOCUMENT_BUSY", "Document is already ingesting")
+        return cast(
+            dict[str, str],
+            _error_response(status.HTTP_409_CONFLICT, "DOCUMENT_BUSY", "Document is already ingesting"),
+        )
 
     document.status = DocumentStatus.INGESTING
     document.error_message = None

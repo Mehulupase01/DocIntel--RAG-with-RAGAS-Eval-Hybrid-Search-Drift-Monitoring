@@ -2,31 +2,26 @@
 
 ## Current Status
 - Active phase: Phase 9 - Hardening
-- Phase 8 objective: ship the Streamlit ops dashboard with KPI home, eval trends, drift reports, cost/latency, retrieval explorer, and the compose overlay
-- Phase 8 delivered:
-  - `apps/dashboard` project with pinned Streamlit, Plotly, pandas, SQLAlchemy, psycopg, and test support
-  - read-only DB helper layer plus live `/search` API client wrapper
-  - dashboard home plus all four blueprint pages
-  - `apps/dashboard/Dockerfile`, `ops/docker/compose.full.yml`, and `docs/deployment.md`
-  - dashboard DB-helper tests and Streamlit AppTest smoke coverage
-- Phase 8 verified:
-  - `uv sync` in `apps/dashboard`
-  - `uv run pytest tests/test_db_queries.py -v` (`3 passed`)
-  - `uv run python -m compileall app.py lib pages tests`
-  - Streamlit `AppTest` rendered `app.py` plus all four page scripts successfully
-  - `docker compose -f docker-compose.yml -f ops/docker/compose.full.yml config`
-- Residual environment note: Windows host access to `localhost:8000` remains flaky, so current-phase route verification used in-process ASGI calls per the user's updated execution policy
-- Runtime note: per user direction on 2026-04-14, OpenRouter-backed live `/api/v1/answer` verification is deferred to the final deployment/hardening gate rather than blocking Phase 4 closure
-- Runtime note: per the same execution policy, live OpenRouter-backed eval runs and the GitHub Actions PR gate remain deferred to the final deployment/hardening gate rather than blocking Phase 5 closure
-- Runtime note: LangSmith remains env-gated and was not live-verified because `LANGSMITH_API_KEY` is optional and not required for intermediate phase closure
-- Runtime note: the local `docintel` database had no prior reference-window query traffic, so Phase 7 verification seeded deterministic historical query/retrieval windows in the local DB before the one-shot drift CLI was run
-- Runtime note: per the same execution policy, full `docker compose ... up -d` with the dashboard service is deferred to final deployment/hardening; Phase 8 closure used compose config validation and Streamlit render smoke checks instead
+- Local hardening implementation now includes:
+  - hardened `apps/api/Dockerfile` and `apps/dashboard/Dockerfile`
+  - `docker-compose.prod.yml`
+  - `.github/workflows/ci.yml`
+  - finalized `.github/workflows/ragas-eval.yml` with model-cache caching and an explicit secret preflight
+  - `mypy.ini`
+  - expanded `README.md`, `docs/deployment.md`, and `docs/release_checklist.md`
+- Local Phase 9 verification completed:
+  - Ruff clean across API, tests, and dashboard
+  - mypy clean for API and dashboard
+  - API regression: `33 passed`
+  - dashboard DB helper tests: `3 passed`
+  - dashboard `compileall` pass
+  - `docker compose -f docker-compose.yml -f docker-compose.prod.yml config` pass
+- Current blockers:
+  - `gh secret list` shows no configured repo secrets, so `OPENROUTER_API_KEY` is still absent for the live `ragas-eval` workflow gate
+  - local prod-overlay `docker compose ... up -d` brings up `db` and `api`, but the dashboard image export/build path remains unreliable on this Windows Docker Desktop machine even after Dockerfile and `.dockerignore` improvements
 
 ## Next Step
-- Execute Phase 9 from the blueprint only:
-  - harden the API and dashboard Dockerfiles, production compose overlays, and workflow definitions
-  - finish the public README, release checklist, and final deployment documentation
-  - run the final live verification pass for deferred Docker/OpenRouter/GitHub workflow gates
-  - update all continuity docs to project-complete state, then commit and push
-- Runtime gate for final deployment verification:
-  - real OpenRouter-backed `/api/v1/answer`, eval runs, the PR workflow secret-backed execution, and optional LangSmith tracing remain deferred until the final live verification pass
+- Push the current Phase 9 hardening work to `main`.
+- Run `gh workflow run ci.yml --ref main` and confirm it goes green on GitHub.
+- Add repo secret `OPENROUTER_API_KEY`, then run `gh workflow run ragas-eval.yml --ref main`.
+- Re-verify the prod overlay on a stable Docker host or after resolving the local Docker Desktop dashboard export issue.

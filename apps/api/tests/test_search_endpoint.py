@@ -4,12 +4,11 @@ import uuid
 from dataclasses import replace
 
 import pytest
-from sqlalchemy import func, select
-
 from docintel.models.chunk import Chunk
 from docintel.models.document import Document, DocumentStatus
 from docintel.models.query import Query
 from docintel.models.retrieval import Retrieval
+from sqlalchemy import func, select
 
 
 def _embedding(index: int) -> list[float]:

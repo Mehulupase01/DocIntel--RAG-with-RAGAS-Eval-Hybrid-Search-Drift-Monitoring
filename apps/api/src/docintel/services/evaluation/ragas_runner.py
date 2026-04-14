@@ -5,11 +5,11 @@ import uuid
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from statistics import mean
-from typing import Protocol
+from typing import Protocol, cast
 
 from langchain_openai import ChatOpenAI
 from ragas import evaluate
-from ragas.dataset_schema import EvaluationDataset
+from ragas.dataset_schema import EvaluationDataset, EvaluationResult
 from ragas.llms import LangchainLLMWrapper
 from ragas.metrics import answer_relevancy, context_precision, context_recall, faithfulness
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -97,7 +97,9 @@ class RagasJudgeScorer:
             llm=self._llm,
             raise_exceptions=True,
             show_progress=False,
+            return_executor=False,
         )
+        result = cast(EvaluationResult, result)
         row = result.scores[0]
         return EvalScores(
             faithfulness=float(row["faithfulness"]),

@@ -3,7 +3,6 @@ from __future__ import annotations
 import uuid
 
 import pytest
-
 from docintel.models.chunk import Chunk
 from docintel.models.document import Document, DocumentStatus
 from docintel.services.retrieval.vector import vector_search

@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from statistics import mean
-from typing import Protocol
+from typing import Protocol, TypedDict
 
 import pandas as pd
 from evidently import ColumnMapping
@@ -41,6 +41,11 @@ class DriftSample:
     retrieval_count: int
     rank_stability: float
     mean_rerank_score: float
+
+
+class QueryRetrievalBucket(TypedDict):
+    query: Query
+    retrievals: list[Retrieval]
 
 
 @dataclass(slots=True)
@@ -243,7 +248,7 @@ async def _load_window_samples(
     )
     rows = (await session.execute(stmt)).all()
 
-    grouped: dict[str, dict[str, object]] = {}
+    grouped: dict[str, QueryRetrievalBucket] = {}
     for query, retrieval in rows:
         bucket = grouped.setdefault(
             str(query.id),

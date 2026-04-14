@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import plotly.express as px
 import streamlit as st
-
 from lib.db import fetch_daily_costs, fetch_latency_summary, fetch_model_cost_breakdown
 
 st.title("Cost and Latency")

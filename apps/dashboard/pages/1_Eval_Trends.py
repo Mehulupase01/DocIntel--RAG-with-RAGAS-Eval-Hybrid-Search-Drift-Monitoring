@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import plotly.express as px
 import streamlit as st
-
 from lib.db import fetch_eval_trends
 
 st.title("Eval Trends")

@@ -5,7 +5,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-
 ROOT_DIR = Path(__file__).resolve().parents[6]
 FIXTURES_DIR = ROOT_DIR / "fixtures"
 DEFAULT_FIXTURE_PATH = FIXTURES_DIR / "eu_ai_act_qa_v1.json"

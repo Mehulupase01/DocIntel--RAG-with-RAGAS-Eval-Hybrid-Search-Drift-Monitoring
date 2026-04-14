@@ -196,3 +196,33 @@ start http://localhost:8501
   - `AppTest` rendered `pages/4_Retrieval_Explorer.py`
 - `docker compose -f docker-compose.yml -f ops/docker/compose.full.yml config`: Passed on 2026-04-14.
 - Per user direction on 2026-04-14, full `docker compose ... up -d` with the dashboard service is deferred to the final deployment/hardening gate instead of blocking intermediate phase closure.
+
+## Phase 9 Commands
+
+```powershell
+uvx --from ruff==0.15.7 ruff check apps/api/src apps/api/tests apps/dashboard
+uv run --directory apps/api --with mypy==1.18.2 mypy --config-file ../../mypy.ini src
+uv run --directory apps/dashboard --with mypy==1.18.2 mypy --config-file ../../mypy.ini app.py lib pages
+uv run --directory apps/api pytest tests -v
+uv run --directory apps/dashboard pytest tests/test_db_queries.py -v
+uv run --directory apps/dashboard python -m compileall app.py lib pages tests
+docker compose -f docker-compose.yml -f docker-compose.prod.yml config
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+gh workflow run ci.yml --ref main
+gh workflow run ragas-eval.yml --ref main
+```
+
+## Phase 9 Status
+- `uvx --from ruff==0.15.7 ruff check apps/api/src apps/api/tests apps/dashboard`: Passed on 2026-04-14.
+- `uv run --directory apps/api --with mypy==1.18.2 mypy --config-file ../../mypy.ini src`: Passed on 2026-04-14.
+- `uv run --directory apps/dashboard --with mypy==1.18.2 mypy --config-file ../../mypy.ini app.py lib pages`: Passed on 2026-04-14.
+- `uv run --directory apps/api pytest tests -v`: Passed on 2026-04-14 (`33 passed`).
+- `uv run --directory apps/dashboard pytest tests/test_db_queries.py -v`: Passed on 2026-04-14 (`3 passed`).
+- `uv run --directory apps/dashboard python -m compileall app.py lib pages tests`: Passed on 2026-04-14.
+- `docker compose -f docker-compose.yml -f docker-compose.prod.yml config`: Passed on 2026-04-14.
+- `docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d`: Partially verified on 2026-04-14.
+  - `db`: healthy
+  - `api`: up
+  - `dashboard`: local image export/build remains unreliable on this Windows Docker Desktop host despite Dockerfile and `.dockerignore` hardening
+- `gh secret list -R Mehulupase01/DocIntel--RAG-with-RAGAS-Eval-Hybrid-Search-Drift-Monitoring`: returned no configured repository secrets on 2026-04-14.
+- Because `OPENROUTER_API_KEY` is still absent at the repository level, live dispatch of `ragas-eval.yml` remains blocked until that secret is configured.

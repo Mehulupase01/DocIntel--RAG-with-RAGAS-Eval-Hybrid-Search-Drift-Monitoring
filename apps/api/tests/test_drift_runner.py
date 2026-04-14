@@ -5,8 +5,6 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
-from sqlalchemy import func, select
-
 from docintel.config import get_settings
 from docintel.models.chunk import Chunk
 from docintel.models.document import Document, DocumentStatus
@@ -15,6 +13,7 @@ from docintel.models.query import Query, RetrievalStrategy
 from docintel.models.retrieval import Retrieval
 from docintel.services.drift.evidently_runner import resolve_drift_status
 from docintel.services.drift.reporter import create_drift_report
+from sqlalchemy import func, select
 
 
 def _embedding(index: int) -> list[float]:

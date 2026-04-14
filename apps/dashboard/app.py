@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import plotly.express as px
 import streamlit as st
-
 from lib.db import fetch_drift_reports, fetch_eval_trends, fetch_home_kpis
 
 

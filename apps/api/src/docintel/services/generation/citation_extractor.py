@@ -5,7 +5,6 @@ from dataclasses import dataclass
 
 from docintel.schemas.search import RetrievedChunk
 
-
 CITATION_PATTERN = re.compile(r"\[c#(\d+)\]")
 
 

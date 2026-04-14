@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from docintel.schemas.search import RetrievedChunk
 
-
 SYSTEM_PROMPT = """You are a regulatory document intelligence assistant for the EU AI Act.
 Answer only from the supplied contexts.
 Every factual claim must include one or more inline citations in the form [c#N].

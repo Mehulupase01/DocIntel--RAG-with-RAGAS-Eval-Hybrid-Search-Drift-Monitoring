@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from httpx import ASGITransport, AsyncClient
-from sqlalchemy.exc import SQLAlchemyError
-
 from docintel.database import get_db
 from docintel.main import app
+from httpx import ASGITransport, AsyncClient
+from sqlalchemy.exc import SQLAlchemyError
 
 
 async def test_liveness(client: AsyncClient) -> None:

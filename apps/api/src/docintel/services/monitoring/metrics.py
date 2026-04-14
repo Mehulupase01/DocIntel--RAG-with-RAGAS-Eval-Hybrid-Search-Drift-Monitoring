@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from prometheus_client import Counter, Gauge, Histogram
 
-
 REQUESTS_TOTAL = Counter(
     "docintel_requests_total",
     "Total HTTP requests handled by DocIntel.",

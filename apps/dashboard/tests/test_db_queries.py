@@ -3,8 +3,6 @@ from __future__ import annotations
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from sqlalchemy import create_engine
-
 from lib.db import (
     answers,
     dashboard_metadata,
@@ -18,6 +16,7 @@ from lib.db import (
     fetch_model_cost_breakdown,
     queries,
 )
+from sqlalchemy import create_engine
 
 
 def _seed_dashboard_fixture(engine) -> datetime:

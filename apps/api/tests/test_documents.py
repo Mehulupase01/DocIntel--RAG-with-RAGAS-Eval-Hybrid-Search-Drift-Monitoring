@@ -4,10 +4,9 @@ import hashlib
 import uuid
 
 import pytest
-from sqlalchemy import func, select
-
 from docintel.models.chunk import Chunk
 from docintel.models.document import Document
+from sqlalchemy import func, select
 
 
 class _StubEmbedder:
