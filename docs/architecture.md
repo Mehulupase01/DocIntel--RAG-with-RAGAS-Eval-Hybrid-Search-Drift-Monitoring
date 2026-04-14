@@ -84,3 +84,17 @@
 - Current fixture payload version: `v0.1`
 - Current fixture size: `25` cases
 - Intermediate verification currently relies on stubbed scoring and local persistence/endpoint tests; live OpenRouter-backed eval execution is deferred to the final deployment/hardening gate by user instruction.
+
+## Current Observability State
+- Verified on 2026-04-14: observability is wired with:
+  - request tracing middleware
+  - Prometheus collectors at root `GET /metrics`
+  - optional LangSmith environment bootstrap
+- Metrics currently instrument:
+  - request counts
+  - request duration
+  - retrieval score components
+  - LLM token totals
+  - LLM cost totals
+  - latest eval aggregate scores
+- LangSmith remains optional and no-op when its env vars are absent.

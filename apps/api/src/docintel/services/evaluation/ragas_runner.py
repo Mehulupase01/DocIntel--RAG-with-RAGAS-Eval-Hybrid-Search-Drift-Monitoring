@@ -23,6 +23,7 @@ from docintel.services.evaluation.fixture_loader import FixtureSuite, load_fixtu
 from docintel.services.evaluation.thresholds import EvalScores, EvalThresholds, case_passes, get_eval_thresholds
 from docintel.services.generation.answerer import AnswerResult, answer_question
 from docintel.services.generation.llm_client import LLMProviderNotConfiguredError
+from docintel.services.monitoring.metrics import record_eval_scores
 
 
 class EvalScorer(Protocol):
@@ -184,6 +185,12 @@ async def run_eval_suite(
         run.context_precision_mean = _mean_or_none(score_rows, "context_precision")
         run.context_recall_mean = _mean_or_none(score_rows, "context_recall")
         run.answer_relevancy_mean = _mean_or_none(score_rows, "answer_relevancy")
+        record_eval_scores(
+            run.faithfulness_mean,
+            run.context_precision_mean,
+            run.context_recall_mean,
+            run.answer_relevancy_mean,
+        )
         run.status = (
             EvalRunStatus.PASSED
             if passed_count == len(score_rows) and len(score_rows) == len(fixture_suite.cases)

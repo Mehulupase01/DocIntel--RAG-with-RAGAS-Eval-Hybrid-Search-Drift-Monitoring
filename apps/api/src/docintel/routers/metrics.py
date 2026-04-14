@@ -1,6 +1,13 @@
-"""Metrics mount."""
+"""Metrics route."""
 
-from prometheus_client import make_asgi_app
+from __future__ import annotations
 
-metrics_app = make_asgi_app()
+from fastapi import APIRouter, Response
+from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 
+router = APIRouter(tags=["metrics"])
+
+
+@router.get("/metrics")
+async def metrics() -> Response:
+    return Response(content=generate_latest(), media_type=CONTENT_TYPE_LATEST)

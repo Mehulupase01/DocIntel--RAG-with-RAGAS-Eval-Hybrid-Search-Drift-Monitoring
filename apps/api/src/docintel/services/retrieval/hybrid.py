@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from docintel.models.query import Query, RetrievalStrategy
 from docintel.models.retrieval import Retrieval
 from docintel.services.ingestion.embedder import get_embedder
+from docintel.services.monitoring.metrics import record_retrieval_scores
 
 from .bm25 import bm25_search
 from .fusion import ChunkScore, reciprocal_rank_fusion
@@ -79,5 +80,6 @@ async def hybrid_search(
         for rank, result in enumerate(results, start=1)
     )
     await session.commit()
+    record_retrieval_scores(strategy.value, results)
 
     return SearchResult(query_id=query_row.id, results=results, latency_ms=latency_ms)

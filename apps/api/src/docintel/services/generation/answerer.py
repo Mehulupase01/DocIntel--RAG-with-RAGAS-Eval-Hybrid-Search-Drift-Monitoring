@@ -15,6 +15,7 @@ from docintel.schemas.search import RetrievedChunk
 from docintel.services.generation.citation_extractor import extract_citations
 from docintel.services.generation.llm_client import OpenRouterClient, get_openrouter_client
 from docintel.services.generation.prompt import build_answer_prompt
+from docintel.services.monitoring.metrics import record_llm_usage
 from docintel.services.retrieval.hybrid import hybrid_search
 
 
@@ -65,6 +66,12 @@ async def answer_question(
 
     answer_text, extracted_citations = extract_citations(generation.text, contexts)
     latency_ms = int((perf_counter() - start) * 1000)
+    record_llm_usage(
+        generation.model,
+        generation.prompt_tokens,
+        generation.completion_tokens,
+        generation.cost_usd,
+    )
 
     answer_row = Answer(
         query_id=retrieval.query_id,

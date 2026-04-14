@@ -32,6 +32,7 @@
 - Phase 3 retrieval layer: complete
 - Phase 4 generation and citations: complete (live OpenRouter verification deferred to final deployment gate by user instruction)
 - Phase 5 evaluation harness: complete (live OpenRouter judge verification deferred to final deployment gate by user instruction)
+- Phase 6 observability: complete
 - Verified on 2026-04-14:
   - `uv sync`
   - `uv run alembic upgrade head`
@@ -58,6 +59,12 @@
   - `uv run alembic upgrade head`
   - `uv run pytest tests/test_eval_runner.py -v`
   - `uv run pytest tests/test_health.py tests/test_chunker.py tests/test_embedder.py tests/test_documents.py tests/test_bm25.py tests/test_vector.py tests/test_fusion.py tests/test_reranker.py tests/test_search_endpoint.py tests/test_citation_extractor.py tests/test_answer_endpoint.py tests/test_eval_runner.py -v`
+- Verified on 2026-04-14 for Phase 6:
+  - `uv run alembic upgrade head`
+  - `uv run pytest tests/test_metrics.py tests/test_tracing_middleware.py -v`
+  - `uv run pytest tests/test_health.py tests/test_chunker.py tests/test_embedder.py tests/test_documents.py tests/test_bm25.py tests/test_vector.py tests/test_fusion.py tests/test_reranker.py tests/test_search_endpoint.py tests/test_citation_extractor.py tests/test_answer_endpoint.py tests/test_eval_runner.py tests/test_metrics.py tests/test_tracing_middleware.py -v`
+  - ASGI `POST /api/v1/search`
+  - ASGI `GET /metrics`
 - Phase 3 benchmark result on seeded fixture:
   - `vector_only`: precision@10 `0.100`, recall@10 `0.500`
   - `hybrid_reranked`: precision@10 `0.150`, recall@10 `0.750`
@@ -70,6 +77,10 @@
   - fixture schema validation, eval persistence, endpoint pagination, and CI gate exit behavior are covered by `tests/test_eval_runner.py`
   - `fixtures/eu_ai_act_qa_v1.json` now ships `25` reviewed seed cases tagged as fixture version `v0.1`
   - `.github/workflows/ragas-eval.yml` is authored for PR gating and awaits final live secret-backed verification
+- Phase 6 observability verification:
+  - `/metrics` exposes the required DocIntel collector names
+  - tracing middleware adds `X-Request-ID`, records request latency, and increments counters
+  - after one real `/api/v1/search`, `/metrics` showed non-zero `docintel_requests_total` entries for the search path
 - Official AI Act verification ingest:
   - source URL: `https://op.europa.eu/o/opportal-service/download-handler?format=PDF&identifier=dc8116a1-3fe6-11ef-865a-01aa75ed71a1&language=en&productionSystem=cellar`
   - SHA256: `bba630444b3278e881066774002a1d7824308934f49ccfa203e65be43692f55e`

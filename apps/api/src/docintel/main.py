@@ -12,8 +12,10 @@ from .routers.answer import router as answer_router
 from .routers.documents import router as documents_router
 from .routers.eval import router as eval_router
 from .routers.health import router as health_router
-from .routers.metrics import metrics_app
+from .routers.metrics import router as metrics_router
 from .routers.search import router as search_router
+from .services.monitoring.langsmith_setup import configure_langsmith
+from .services.monitoring.tracing import tracing_middleware
 
 logger = get_logger(__name__)
 
@@ -21,7 +23,9 @@ logger = get_logger(__name__)
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     configure_logging()
+    langsmith_enabled = configure_langsmith()
     logger.info("docintel.startup")
+    logger.info("docintel.langsmith", enabled=langsmith_enabled)
     yield
     logger.info("docintel.shutdown")
 
@@ -47,8 +51,9 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    app.middleware("http")(tracing_middleware)
     app.include_router(api_router)
-    app.mount("/metrics", metrics_app)
+    app.include_router(metrics_router)
 
     return app
 
