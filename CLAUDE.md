@@ -24,6 +24,7 @@
 - BM25 via Postgres `tsvector` + GIN; vector via pgvector HNSW (cosine)
 - Fusion: Reciprocal Rank Fusion (`k=60`)
 - LLM: OpenRouter; default generation `minimax/minimax-m2.5:free`, judge `nvidia/nemotron-3-super-120b-a12b:free`
+- Approved verification-only backup pair: generation `anthropic/claude-haiku-4.5`, judge `openai/gpt-4o-mini`
 - Eval: RAGAS faithfulness/context_precision/context_recall/answer_relevancy with CI gate
 - Drift: Evidently weekly job via APScheduler
 
@@ -96,7 +97,7 @@
 - Phase 5 evaluation verification:
   - fixture schema validation, eval persistence, endpoint pagination, and CI gate exit behavior are covered by `tests/test_eval_runner.py`
   - `fixtures/eu_ai_act_qa_v1.json` now ships `25` reviewed seed cases tagged as fixture version `v0.1`
-  - `.github/workflows/ragas-eval.yml` is authored for PR gating and awaits final live secret-backed verification
+  - `.github/workflows/ragas-eval.yml` is authored for PR gating and now skips cleanly when repo secrets are intentionally absent
   - live judge smoke with `nvidia/nemotron-3-super-120b-a12b:free` now uses the local sentence-transformer embeddings path instead of a hidden OpenAI embedding default, but the provider returned `524 Provider returned error` for the RAGAS metric prompts on 2026-04-14
 - Phase 6 observability verification:
   - `/metrics` exposes the required DocIntel collector names
@@ -124,12 +125,18 @@
   - `uv run --directory apps/dashboard python -m compileall app.py lib pages tests`
   - `docker build -t docintel-dashboard:test apps/dashboard`
   - `docker compose -f docker-compose.yml -f docker-compose.prod.yml config`
+  - `uv run --directory apps/api python -m docintel.tools.benchmark_retrieval --top-k 10`
+  - `uv run --directory apps/api python -m docintel.tools.run_drift --window-days 7 --reference-window-days 7`
+  - local uvicorn startup with `LANGSMITH_TRACING=true` plus live `/api/v1/search` and `/api/v1/answer` route probes
 - Phase 9 blocker state:
-  - `gh secret list` currently shows no configured repository secrets, so GitHub-hosted live `ragas-eval` verification still needs `OPENROUTER_API_KEY` to be uploaded as a repo secret if the user approves that step
-  - `gh workflow run ci.yml --ref main` passed on GitHub run `24394769593`
-  - `gh workflow run ragas-eval.yml --ref main` failed fast on the explicit missing-secret preflight in GitHub run `24393783852`
-  - the dashboard image now rebuilds cleanly from the app-scoped Docker context, but a fresh API image rebuild (`docker build apps/api` or `docker compose ... up -d --build`) still timed out after 60 minutes on this Windows Docker Desktop host even after the CPU-only torch pin and Docker context reductions
-  - the user-selected free OpenRouter defaults are not yet both provider-stable in live verification on 2026-04-14: `minimax/minimax-m2.5:free` returned provider-limit `429` on generation, and `nvidia/nemotron-3-super-120b-a12b:free` returned provider timeout `524` on RAGAS judge prompts
+  - `gh secret list` still shows no configured repository secrets, but GitHub-hosted `ragas-eval` is now optional and should skip cleanly instead of failing
+  - `gh workflow run ci.yml --ref main` last known pass is GitHub run `24394769593`; the expanded Docker image-build jobs still need a fresh post-push run
+  - the dashboard image rebuilds cleanly from the app-scoped Docker context, but a fresh API image rebuild (`docker build apps/api` or `docker compose ... up -d --build`) still times out after 60 minutes on this Windows Docker Desktop host even after the CPU-only torch pin and Docker context reductions; Linux CI is now the hard Docker gate
+  - live verification on 2026-04-15 is blocked by the current local OpenRouter key budget:
+    - `/api/v1/answer` with `minimax/minimax-m2.5:free` now cleanly returns upstream `429`
+    - `/api/v1/answer` with verification model `anthropic/claude-haiku-4.5` returns upstream `403 Key limit exceeded`
+    - local eval run `3a5879fe-6be9-40fd-b635-c1ca670b8584` errored on the tracked default pair after upstream `429`
+    - local eval run `3970c7fd-b631-47a7-9f81-f7973f5fe31f` errored on the verification pair after upstream `403 Key limit exceeded`
 - Official AI Act verification ingest:
   - source URL: `https://op.europa.eu/o/opportal-service/download-handler?format=PDF&identifier=dc8116a1-3fe6-11ef-865a-01aa75ed71a1&language=en&productionSystem=cellar`
   - SHA256: `bba630444b3278e881066774002a1d7824308934f49ccfa203e65be43692f55e`

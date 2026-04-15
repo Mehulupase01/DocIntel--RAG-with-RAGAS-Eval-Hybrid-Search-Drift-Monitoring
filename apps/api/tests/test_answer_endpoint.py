@@ -141,6 +141,54 @@ def _provider_error_transport() -> httpx.MockTransport:
     return httpx.MockTransport(handler)
 
 
+def _output_text_transport() -> httpx.MockTransport:
+    def handler(_request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200,
+            json={
+                "id": "gen-2",
+                "model": "anthropic/claude-haiku-4.5",
+                "choices": [
+                    {
+                        "index": 0,
+                        "finish_reason": "stop",
+                        "message": {
+                            "role": "assistant",
+                            "content": [{"type": "output_text", "text": "Structured success."}],
+                        },
+                    }
+                ],
+                "usage": {"prompt_tokens": 11, "completion_tokens": 3},
+            },
+        )
+
+    return httpx.MockTransport(handler)
+
+
+def _dict_text_transport() -> httpx.MockTransport:
+    def handler(_request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200,
+            json={
+                "id": "gen-3",
+                "model": "openai/gpt-4o-mini",
+                "choices": [
+                    {
+                        "index": 0,
+                        "finish_reason": "stop",
+                        "message": {
+                            "role": "assistant",
+                            "content": {"text": "Dict success."},
+                        },
+                    }
+                ],
+                "usage": {"prompt_tokens": 9, "completion_tokens": 2},
+            },
+        )
+
+    return httpx.MockTransport(handler)
+
+
 @pytest.mark.asyncio
 async def test_openrouter_client_raises_on_provider_error_payload():
     async with httpx.AsyncClient(transport=_provider_error_transport(), base_url="https://openrouter.ai/api/v1") as http_client:
@@ -152,6 +200,36 @@ async def test_openrouter_client_raises_on_provider_error_payload():
                 temperature=0.0,
                 max_tokens=16,
             )
+
+
+@pytest.mark.asyncio
+async def test_openrouter_client_accepts_output_text_parts():
+    async with httpx.AsyncClient(transport=_output_text_transport(), base_url="https://openrouter.ai/api/v1") as http_client:
+        client = OpenRouterClient(api_key="test-key", http_client=http_client, max_retries=1)
+        result = await client.generate(
+            messages=[{"role": "user", "content": "ping"}],
+            model="anthropic/claude-haiku-4.5",
+            temperature=0.0,
+            max_tokens=16,
+        )
+
+    assert result.text == "Structured success."
+    assert result.model == "anthropic/claude-haiku-4.5"
+
+
+@pytest.mark.asyncio
+async def test_openrouter_client_accepts_dict_text_content():
+    async with httpx.AsyncClient(transport=_dict_text_transport(), base_url="https://openrouter.ai/api/v1") as http_client:
+        client = OpenRouterClient(api_key="test-key", http_client=http_client, max_retries=1)
+        result = await client.generate(
+            messages=[{"role": "user", "content": "ping"}],
+            model="openai/gpt-4o-mini",
+            temperature=0.0,
+            max_tokens=16,
+        )
+
+    assert result.text == "Dict success."
+    assert result.model == "openai/gpt-4o-mini"
 
 
 @pytest.mark.asyncio

@@ -206,35 +206,48 @@ uv run --directory apps/dashboard --with mypy==1.18.2 mypy --config-file ../../m
 uv run --directory apps/api pytest tests -v
 uv run --directory apps/dashboard pytest tests/test_db_queries.py -v
 uv run --directory apps/dashboard python -m compileall app.py lib pages tests
+uv run --directory apps/api python -m docintel.tools.benchmark_retrieval --top-k 10
+uv run --directory apps/api python -m docintel.tools.run_drift --window-days 7 --reference-window-days 7
 docker compose -f docker-compose.yml -f docker-compose.prod.yml config
-docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 gh workflow run ci.yml --ref main
 gh workflow run ragas-eval.yml --ref main
 ```
 
 ## Phase 9 Status
-- `uvx --from ruff==0.15.7 ruff check apps/api/src apps/api/tests apps/dashboard`: Passed on 2026-04-14.
-- `uv run --directory apps/api --with mypy==1.18.2 mypy --config-file ../../mypy.ini src`: Passed on 2026-04-14.
-- `uv run --directory apps/dashboard --with mypy==1.18.2 mypy --config-file ../../mypy.ini app.py lib pages`: Passed on 2026-04-14.
+- `uvx --from ruff==0.15.7 ruff check apps/api/src apps/api/tests apps/dashboard`: Passed on 2026-04-15.
+- `uv run --directory apps/api --with mypy==1.18.2 mypy --config-file ../../mypy.ini src`: Passed on 2026-04-15.
+- `uv run --directory apps/dashboard --with mypy==1.18.2 mypy --config-file ../../mypy.ini app.py lib pages`: Passed on 2026-04-15.
 - `uv lock --directory apps/api`: Passed on 2026-04-14 and re-resolved `torch` to the CPU wheel (`2.6.0+cpu`) while removing the Linux CUDA/triton packages from `apps/api/uv.lock`.
 - `uv sync --directory apps/api`: Passed on 2026-04-14 after the lockfile hardening update.
-- `uv run --directory apps/api pytest tests -v`: Passed on 2026-04-14 (`33 passed`).
-- `uv run --directory apps/dashboard pytest tests/test_db_queries.py -v`: Passed on 2026-04-14 (`3 passed`).
-- `uv run --directory apps/dashboard python -m compileall app.py lib pages tests`: Passed on 2026-04-14.
-- `uv run --directory apps/api pytest tests/test_answer_endpoint.py tests/test_eval_runner.py -v`: Passed on 2026-04-14 (`9 passed`) after:
-  - explicit handling for OpenRouter `{"error": ...}` payloads inside HTTP `200` responses
-  - explicit local sentence-transformer embeddings passed into `ragas.evaluate()` so the live eval path no longer requires `OPENAI_API_KEY`
+- `uv run --directory apps/api pytest tests -v`: Passed on 2026-04-15 (`37 passed`).
+- `uv run --directory apps/dashboard pytest tests/test_db_queries.py -v`: Passed on 2026-04-15 (`3 passed`).
+- `uv run --directory apps/dashboard python -m compileall app.py lib pages tests`: Passed on 2026-04-15.
+- `uv run --directory apps/api pytest tests/test_answer_endpoint.py tests/test_eval_runner.py -v`: Passed on 2026-04-15 (`11 passed`) after:
+  - broader parsing for OpenRouter content payloads shaped as `output_text` parts or dict-style `{text: ...}` content
+  - existing explicit local sentence-transformer embeddings passed into `ragas.evaluate()` so the live eval path no longer requires `OPENAI_API_KEY`
+- `uv run --directory apps/api python -m docintel.tools.benchmark_retrieval --top-k 10`: Passed on 2026-04-15.
+  - `vector_only`: precision@10 `0.100`, recall@10 `0.500`
+  - `hybrid_reranked`: precision@10 `0.150`, recall@10 `0.750`
+- `uv run --directory apps/api python -m docintel.tools.run_drift --window-days 7 --reference-window-days 7`: Passed on 2026-04-15 and created:
+  - report id: `3a1603f0-9ce6-482b-bf0d-4ee829c3c9fb`
+  - status: `alert`
+  - `embedding_drift_score`: `0.12628050186595108`
+  - `query_drift_score`: `1.0`
+  - `retrieval_quality_delta`: `-0.56716799512358`
+  - HTML artifact: `apps/api/artifacts/drift/3a1603f0-9ce6-482b-bf0d-4ee829c3c9fb.html`
 - `docker build -t docintel-dashboard:test apps/dashboard`: Passed on 2026-04-14 using the app-scoped build context and `.dockerignore`.
-- `docker compose -f docker-compose.yml -f docker-compose.prod.yml config`: Passed on 2026-04-14.
+- `docker compose -f docker-compose.yml -f docker-compose.prod.yml config`: Passed on 2026-04-15.
 - `docker build -t docintel-api:test apps/api`: Timed out on 2026-04-14 after 60 minutes on this Windows Docker Desktop host while rebuilding the fresh hardened API image.
 - `docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build`: Timed out on 2026-04-14 after 60 minutes on this Windows Docker Desktop host while waiting on the fresh API image rebuild.
-- Local live generation verification on 2026-04-14:
-  - `POST /api/v1/answer` with the requested default model `minimax/minimax-m2.5:free`: reached OpenRouter but returned provider-limit `429`
-  - `POST /api/v1/answer` with request-level model override `nvidia/nemotron-3-super-120b-a12b:free`: returned `200` against the real EU AI Act corpus and persisted a live answer row
-- Local live evaluation/tracing verification on 2026-04-14:
-  - `RagasJudgeScorer('nvidia/nemotron-3-super-120b-a12b:free')`: no longer falls back to OpenAI embeddings after the local embedding fix
-  - the live judge smoke reached LangSmith: the EU LangSmith project `docintel-dev` contains recent runs including `ChatOpenAI` `error` traces and pending RAGAS chains from the smoke attempt
-  - the same live judge smoke currently fails on provider timeout `524` from the selected free Nemotron judge model
-- `gh workflow run ci.yml --ref main`: Passed on GitHub run `24394769593`.
+- Local live route verification on 2026-04-15:
+  - local uvicorn startup logged `docintel.langsmith enabled=True`
+  - local `POST /api/v1/search`: returned `200` against the real EU AI Act corpus with `5` results and `EU AI Act` as the top document
+  - local `POST /api/v1/answer` with the tracked default model `minimax/minimax-m2.5:free`: returned upstream `429` via `502 LLM_PROVIDER_ERROR`
+  - local `POST /api/v1/answer` with verification model `anthropic/claude-haiku-4.5`: returned upstream `403 Key limit exceeded` via `502 LLM_PROVIDER_ERROR`
+- Local live evaluation verification on 2026-04-15:
+  - default pair run persisted errored run `3a5879fe-6be9-40fd-b635-c1ca670b8584` after upstream `429`
+  - verification pair run persisted errored run `3970c7fd-b631-47a7-9f81-f7973f5fe31f` after upstream `403 Key limit exceeded`
+  - the current local OpenRouter key therefore blocks both the tracked defaults and the verification pair from closing the live eval gate today
+- `gh workflow run ci.yml --ref main`: Last known pass remains GitHub run `24394769593`; the new Ubuntu Docker image-build jobs still need a fresh post-push run.
 - `gh secret list -R Mehulupase01/DocIntel--RAG-with-RAGAS-Eval-Hybrid-Search-Drift-Monitoring`: returned no configured repository secrets on 2026-04-14.
-- `gh workflow run ragas-eval.yml --ref main`: Failed on GitHub run `24393783852` at the explicit `Require OpenRouter secret` preflight step because `OPENROUTER_API_KEY` is still absent at the repository level and has not been uploaded by user instruction.
+- `.github/workflows/ragas-eval.yml` now skips cleanly when `OPENROUTER_API_KEY` is absent at the repository level instead of failing on a secret preflight.

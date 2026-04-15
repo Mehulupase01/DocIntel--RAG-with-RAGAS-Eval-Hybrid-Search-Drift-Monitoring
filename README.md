@@ -28,13 +28,13 @@ This repository answers those questions with one modular monolith:
 |---|---|
 | Corpus | Official English EU AI Act PDF ingested with `144` pages and `331` chunks |
 | Retrieval benchmark | `hybrid_reranked` precision@10 `0.150` vs `vector_only` `0.100` on the seeded benchmark fixture |
-| API quality gates | Ruff clean, mypy clean, `33` API tests passing locally |
+| API quality gates | Ruff clean, mypy clean, `37` API tests passing locally |
 | Dashboard quality gates | mypy clean, `3` dashboard DB-helper tests passing, Streamlit page smoke renders passing |
 | Observability | Root `GET /metrics` implemented and verified in-process |
 | Drift | Persisted drift report `53df52b6-07e9-49b8-8b6a-a213c35e9a37` with HTML artifact output |
 | GitHub Actions | `ci.yml` passed on GitHub run `24394769593` |
 | Compose validation | `docker compose -f docker-compose.yml -f docker-compose.prod.yml config` passes |
-| Final live blockers | GitHub still has no repo secrets configured; local live checks also show provider instability for the chosen free-model defaults (`MiniMax 429`, `Nemotron judge 524`) |
+| Final live blockers | Local OpenRouter verification is currently blocked by provider/account limits: default generation returns `429` and the backup verification lane returns `403 Key limit exceeded` with the current local-only key |
 
 ## System Overview
 
@@ -167,7 +167,10 @@ uv run --directory apps/dashboard python -m compileall app.py lib pages tests
 - Current payload version: `v0.1`
 - Current fixture size: `25` reviewed seed cases
 - Workflow committed: `.github/workflows/ragas-eval.yml`
-- Live execution still requires repo secret `OPENROUTER_API_KEY`
+- GitHub-hosted live execution is now optional and skips cleanly when `OPENROUTER_API_KEY` is not configured in repo secrets
+- Local live verification uses the tracked defaults first, then the approved verification-only backup pair:
+  - generation: `anthropic/claude-haiku-4.5`
+  - judge: `openai/gpt-4o-mini`
 
 ### Drift posture
 
@@ -185,18 +188,17 @@ In short:
 - `ops/docker/compose.full.yml` adds the dashboard
 - `docker-compose.prod.yml` adds tagged images, restart policies, resource limits, and named artifact storage
 
-## Known Final-Live Gates
+## Known Release Gates
 
-These are the remaining non-code blockers as of 2026-04-14:
+These are the remaining release blockers as of 2026-04-15:
 
-- `OPENROUTER_API_KEY` is not configured in the GitHub repo secrets, so the live `ragas-eval` workflow cannot succeed yet
-- `ragas-eval.yml` was dispatched and failed fast on the explicit secret preflight in GitHub run `24393783852`
-- GitHub repo secret inventory is currently empty from the authenticated CLI view
-- `docker build -t docintel-dashboard:test apps/dashboard` now succeeds locally from the app-scoped build context
-- a fresh API image rebuild on this Windows Docker Desktop host still times out after 60 minutes even after the CPU-only torch pin and build-context reductions
-- local live `/api/v1/answer` with the requested default `minimax/minimax-m2.5:free` currently returns provider-limit `429`
-- local live `/api/v1/answer` with request override `nvidia/nemotron-3-super-120b-a12b:free` succeeds
-- local live RAGAS judge verification with `nvidia/nemotron-3-super-120b-a12b:free` reaches LangSmith but currently returns provider timeout `524`
+- The local OpenRouter key is currently over its daily budget for the verification lanes:
+  - local live `/api/v1/answer` with the tracked default `minimax/minimax-m2.5:free` returns upstream `429`
+  - local live `/api/v1/answer` with the approved verification model `anthropic/claude-haiku-4.5` returns upstream `403 Key limit exceeded`
+  - local live eval with the tracked default pair errors immediately on generation with upstream `429`
+  - local live eval with the verification pair `anthropic/claude-haiku-4.5` + `openai/gpt-4o-mini` errors immediately with upstream `403 Key limit exceeded`
+- `ragas-eval.yml` is now intentionally optional under the local-only secret policy; repo-secret absence is no longer a release blocker by itself
+- `docker build -t docintel-dashboard:test apps/dashboard` succeeds locally, but a fresh API image rebuild on this Windows Docker Desktop host still times out after 60 minutes, so Linux CI image builds are the authoritative container proof
 
 ## Docs
 

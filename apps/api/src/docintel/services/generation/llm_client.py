@@ -137,9 +137,30 @@ class OpenRouterClient:
 def _extract_text_content(content: Any) -> str:
     if isinstance(content, str):
         return content.strip()
+    if isinstance(content, dict):
+        if "text" in content and content.get("text") is not None:
+            return str(content["text"]).strip()
+        if "content" in content:
+            return _extract_text_content(content["content"])
     if isinstance(content, list):
-        text_parts = [str(item.get("text", "")) for item in content if isinstance(item, dict) and item.get("type") == "text"]
-        return "\n".join(part for part in text_parts if part).strip()
+        text_parts: list[str] = []
+        for item in content:
+            if isinstance(item, str):
+                candidate = item.strip()
+            elif isinstance(item, dict):
+                item_type = item.get("type")
+                if item_type in {"text", "output_text"} or "text" in item:
+                    candidate = str(item.get("text", "")).strip()
+                elif "content" in item:
+                    candidate = _extract_text_content(item["content"])
+                else:
+                    candidate = ""
+            else:
+                candidate = ""
+            if candidate:
+                text_parts.append(candidate)
+        if text_parts:
+            return "\n".join(text_parts).strip()
     raise LLMProviderError("OpenRouter response content was not a string or text-part list")
 
 

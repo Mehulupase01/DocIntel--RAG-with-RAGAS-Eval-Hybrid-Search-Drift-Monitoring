@@ -27,7 +27,6 @@ This adds:
 
 ```powershell
 docker compose -f docker-compose.yml -f docker-compose.prod.yml config
-docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 ```
 
 The production overlay adds:
@@ -81,13 +80,15 @@ The production overlay adds:
 
 ## GitHub Actions Secrets
 
-As of 2026-04-14, the authenticated CLI sees no configured repo secrets for:
+As of 2026-04-15, the authenticated CLI still sees no configured repo secrets for:
 
 ```text
 Mehulupase01/DocIntel--RAG-with-RAGAS-Eval-Hybrid-Search-Drift-Monitoring
 ```
 
-To fully unlock live workflow verification, configure:
+Under the current local-only secret policy, this is acceptable. The repo now treats GitHub-hosted live eval as optional automation, not as a required release gate.
+
+If you do want GitHub-hosted live eval later, configure:
 
 - `OPENROUTER_API_KEY`
 - optionally `LANGSMITH_API_KEY`
@@ -104,12 +105,26 @@ To fully unlock live workflow verification, configure:
 - `docker compose -f docker-compose.yml -f docker-compose.prod.yml config` is verified locally.
 - `docker build -t docintel-dashboard:test apps/dashboard` is verified locally from the app-scoped build context.
 - On this Windows Docker Desktop host, a fresh API image rebuild (`docker build apps/api` or `docker compose ... up -d --build`) still times out after 60 minutes even after the CPU-only torch pin, lazy RAGAS imports, and smaller build contexts.
-- The Dockerfiles are production-shaped and locally validated as far as Ruff, mypy, pytest, dashboard image build, and Compose config are concerned, but a clean full-stack prod-overlay bring-up is still best re-verified on a Linux CI runner or after the local Docker Desktop API image rebuild/export issue is resolved.
+- The authoritative container proof now lives in Ubuntu GitHub Actions image builds for `apps/api` and `apps/dashboard`, not in this Windows host's fresh API rebuild path.
+- The Dockerfiles are production-shaped and locally validated as far as Ruff, mypy, pytest, dashboard image build, and Compose config are concerned, but a clean full-stack prod-overlay bring-up is still best re-verified on a stable Linux Docker host if this Windows Docker Desktop bottleneck persists.
+
+## Local Live Verification Policy
+
+- Tracked runtime defaults remain:
+  - generation: `minimax/minimax-m2.5:free`
+  - judge: `nvidia/nemotron-3-super-120b-a12b:free`
+- Approved verification-only backup pair:
+  - generation: `anthropic/claude-haiku-4.5`
+  - judge: `openai/gpt-4o-mini`
+- Release verification should try the tracked defaults first.
+- If the default generation model fails with a provider-classified limit error, re-run the same local live answer check with `anthropic/claude-haiku-4.5`.
+- If the default eval lane fails with a provider-classified limit or timeout error, re-run the local eval lane with `anthropic/claude-haiku-4.5` plus `openai/gpt-4o-mini`.
 
 ## Recommended Final Release Pass
 
-1. Configure `OPENROUTER_API_KEY` as a GitHub repository secret.
-2. Push the Phase 9 hardening commit.
-3. Run `gh workflow run ci.yml --ref main`.
-4. Run `gh workflow run ragas-eval.yml --ref main`.
-5. Re-run `docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d` on a stable Docker host and confirm all three services are healthy.
+1. Push the latest Phase 9 hardening commit.
+2. Run `gh workflow run ci.yml --ref main` and confirm the Ubuntu lint, typecheck, test, and Docker image-build jobs are green.
+3. Run the local live answer verification with the local-only `OPENROUTER_API_KEY`.
+4. Run the local live eval verification with the local-only `OPENROUTER_API_KEY`.
+5. Review the latest retrieval benchmark and drift report outputs.
+6. Optionally configure `OPENROUTER_API_KEY` as a GitHub repository secret and run `gh workflow run ragas-eval.yml --ref main` if GitHub-hosted live eval is desired.

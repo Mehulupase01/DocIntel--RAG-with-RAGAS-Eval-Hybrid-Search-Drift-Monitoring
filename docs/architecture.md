@@ -130,7 +130,7 @@
   - a CPU-only `torch` resolution path for the API runtime
   - `docker-compose.prod.yml`
   - `.github/workflows/ci.yml`
-  - a finalized `ragas-eval.yml` with model-cache support and an explicit secret preflight
+  - a finalized `ragas-eval.yml` with model-cache support and a conditional secret check that skips cleanly when GitHub lacks `OPENROUTER_API_KEY`
   - a root `mypy.ini`
   - expanded public README and deployment/release documentation
 - Local hardening verification currently includes:
@@ -140,6 +140,10 @@
   - dashboard test and compile pass
   - dashboard image build pass
   - `docker compose -f docker-compose.yml -f docker-compose.prod.yml config` pass
+  - refreshed retrieval benchmark pass on 2026-04-15 with `hybrid_reranked` still outperforming `vector_only`
+  - refreshed drift run on 2026-04-15 producing report `3a1603f0-9ce6-482b-bf0d-4ee829c3c9fb`
+  - local uvicorn verification on 2026-04-15 confirming `docintel.langsmith enabled=True`, `POST /api/v1/search` `200`, and the real live provider path for `/api/v1/answer`
 - Remaining final-live blockers:
-  - GitHub repo secrets are currently absent, so the live OpenRouter-backed workflow gate is not yet runnable
-  - local Docker Desktop still times out on a fresh hardened API image rebuild under the prod overlay even after the CPU-only torch pin and build-context optimizations
+  - the current local OpenRouter key is over its daily budget, so local live answer/eval verification cannot yet pass even with the approved verification pair
+  - GitHub repo secrets remain absent, so `ragas-eval.yml` stays in optional-skip mode rather than running live eval in Actions
+  - local Docker Desktop still times out on a fresh hardened API image rebuild under the prod overlay even after the CPU-only torch pin and build-context optimizations, but Ubuntu CI image builds are now the authoritative container proof
