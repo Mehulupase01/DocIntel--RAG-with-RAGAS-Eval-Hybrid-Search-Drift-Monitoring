@@ -248,6 +248,7 @@ gh workflow run ragas-eval.yml --ref main
   - default pair run persisted errored run `3a5879fe-6be9-40fd-b635-c1ca670b8584` after upstream `429`
   - verification pair run persisted errored run `3970c7fd-b631-47a7-9f81-f7973f5fe31f` after upstream `403 Key limit exceeded`
   - the current local OpenRouter key therefore blocks both the tracked defaults and the verification pair from closing the live eval gate today
-- `gh workflow run ci.yml --ref main`: Last known pass remains GitHub run `24394769593`; the new Ubuntu Docker image-build jobs still need a fresh post-push run.
+- `gh workflow run ci.yml --ref main`: Passed on GitHub run `24476974916`, including the new Ubuntu Docker image-build jobs for `apps/api` and `apps/dashboard`.
 - `gh secret list -R Mehulupase01/DocIntel--RAG-with-RAGAS-Eval-Hybrid-Search-Drift-Monitoring`: returned no configured repository secrets on 2026-04-14.
-- `.github/workflows/ragas-eval.yml` now skips cleanly when `OPENROUTER_API_KEY` is absent at the repository level instead of failing on a secret preflight.
+- `gh workflow run ragas-eval.yml --ref main`: Passed on GitHub run `24476974864` by taking the intentional skip path while `OPENROUTER_API_KEY` remains absent at the repository level.
+- GitHub Actions emitted non-blocking Node 20 deprecation warnings for `actions/checkout@v4`, `actions/setup-python@v5`, and `astral-sh/setup-uv@v4`.

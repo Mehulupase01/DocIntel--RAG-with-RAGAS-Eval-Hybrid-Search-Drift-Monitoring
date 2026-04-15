@@ -40,14 +40,12 @@
   - local `POST /api/v1/answer` with verification model `anthropic/claude-haiku-4.5`: upstream `403 Key limit exceeded` on 2026-04-15
   - local eval run with tracked default pair persisted errored run `3a5879fe-6be9-40fd-b635-c1ca670b8584` after upstream `429`
   - local eval run with verification pair persisted errored run `3970c7fd-b631-47a7-9f81-f7973f5fe31f` after upstream `403 Key limit exceeded`
-  - `gh workflow run ci.yml --ref main` last known pass remains GitHub run `24394769593`; the expanded Docker-build workflow still needs a fresh post-push run
+  - `gh workflow run ci.yml --ref main`: passed on GitHub run `24476974916`, including the Ubuntu API and dashboard Docker image builds
+  - `gh workflow run ragas-eval.yml --ref main`: passed in intentional skip mode on GitHub run `24476974864` because repo secrets remain absent by policy
 - Current blockers:
   - the current local OpenRouter key is over its daily budget, so both the tracked defaults and the verification pair remain blocked from completing a green live answer/eval pass
-  - the expanded `.github/workflows/ci.yml` still needs a fresh post-push GitHub run to verify the new Ubuntu Docker image-build jobs
   - a fresh API image rebuild (`docker build apps/api` or `docker compose ... up -d --build`) still times out after 60 minutes on this Windows Docker Desktop machine even after the CPU-only torch pin, lazy eval imports, and app-scoped Docker contexts, but that is now non-blocking environment debt because Linux CI is the hard Docker gate
+  - GitHub Actions emits a non-blocking Node 20 deprecation warning for `actions/checkout@v4`, `actions/setup-python@v5`, and `astral-sh/setup-uv@v4`; the workflows are green today but should be bumped to Node 24-compatible action versions in a later maintenance pass
 
 ## Next Step
-- Push the current Phase 9 hardening continuation commit.
-- Run `gh workflow run ci.yml --ref main` and confirm the new Ubuntu Docker image-build jobs pass.
-- Optionally run `gh workflow run ragas-eval.yml --ref main`; it should now skip cleanly while repo secrets remain absent.
 - Re-attempt local live `/api/v1/answer` and local eval verification after the OpenRouter daily key limit resets or a fresh local-only key is supplied.

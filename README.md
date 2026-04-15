@@ -32,7 +32,7 @@ This repository answers those questions with one modular monolith:
 | Dashboard quality gates | mypy clean, `3` dashboard DB-helper tests passing, Streamlit page smoke renders passing |
 | Observability | Root `GET /metrics` implemented and verified in-process |
 | Drift | Persisted drift report `53df52b6-07e9-49b8-8b6a-a213c35e9a37` with HTML artifact output |
-| GitHub Actions | `ci.yml` passed on GitHub run `24394769593` |
+| GitHub Actions | `ci.yml` passed on GitHub run `24476974916`, including the Ubuntu API and dashboard Docker image builds |
 | Compose validation | `docker compose -f docker-compose.yml -f docker-compose.prod.yml config` passes |
 | Final live blockers | Local OpenRouter verification is currently blocked by provider/account limits: default generation returns `429` and the backup verification lane returns `403 Key limit exceeded` with the current local-only key |
 

@@ -140,6 +140,8 @@
   - dashboard test and compile pass
   - dashboard image build pass
   - `docker compose -f docker-compose.yml -f docker-compose.prod.yml config` pass
+  - GitHub Actions `ci.yml` pass on run `24476974916`, including Ubuntu Docker image builds for `apps/api` and `apps/dashboard`
+  - GitHub Actions `ragas-eval.yml` pass on run `24476974864` in intentional skip mode while repo secrets remain absent
   - refreshed retrieval benchmark pass on 2026-04-15 with `hybrid_reranked` still outperforming `vector_only`
   - refreshed drift run on 2026-04-15 producing report `3a1603f0-9ce6-482b-bf0d-4ee829c3c9fb`
   - local uvicorn verification on 2026-04-15 confirming `docintel.langsmith enabled=True`, `POST /api/v1/search` `200`, and the real live provider path for `/api/v1/answer`

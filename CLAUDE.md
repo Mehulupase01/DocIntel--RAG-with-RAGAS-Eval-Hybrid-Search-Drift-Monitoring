@@ -130,8 +130,10 @@
   - local uvicorn startup with `LANGSMITH_TRACING=true` plus live `/api/v1/search` and `/api/v1/answer` route probes
 - Phase 9 blocker state:
   - `gh secret list` still shows no configured repository secrets, but GitHub-hosted `ragas-eval` is now optional and should skip cleanly instead of failing
-  - `gh workflow run ci.yml --ref main` last known pass is GitHub run `24394769593`; the expanded Docker image-build jobs still need a fresh post-push run
+  - `gh workflow run ci.yml --ref main` passed on GitHub run `24476974916`, including the Ubuntu API and dashboard Docker image-build jobs
+  - `gh workflow run ragas-eval.yml --ref main` passed in intentional skip mode on GitHub run `24476974864`
   - the dashboard image rebuilds cleanly from the app-scoped Docker context, but a fresh API image rebuild (`docker build apps/api` or `docker compose ... up -d --build`) still times out after 60 minutes on this Windows Docker Desktop host even after the CPU-only torch pin and Docker context reductions; Linux CI is now the hard Docker gate
+  - GitHub Actions currently emit non-blocking Node 20 deprecation warnings for `actions/checkout@v4`, `actions/setup-python@v5`, and `astral-sh/setup-uv@v4`; these should be upgraded in a later maintenance pass
   - live verification on 2026-04-15 is blocked by the current local OpenRouter key budget:
     - `/api/v1/answer` with `minimax/minimax-m2.5:free` now cleanly returns upstream `429`
     - `/api/v1/answer` with verification model `anthropic/claude-haiku-4.5` returns upstream `403 Key limit exceeded`
