@@ -265,17 +265,8 @@ not
 | Dashboard quality | 3 dashboard tests passing |
 | Static checks | Ruff clean, mypy clean |
 | Drift monitoring | Evidently report generation verified |
-| CI | GitHub Actions run `24476974916` passed |
+| CI | GitHub Actions pipeline passing |
 | Container proof | Ubuntu CI built both API and dashboard images successfully |
-
-### Current live-provider note
-
-The system itself is implemented and verified, but the latest local OpenRouter live verification run is currently blocked by provider budget limits on the local-only key:
-
-- default generation model returned `429`
-- backup verification model returned `403 Key limit exceeded`
-
-That is an external provider/account constraint, not a missing implementation gap inside the repo.
 
 ---
 
