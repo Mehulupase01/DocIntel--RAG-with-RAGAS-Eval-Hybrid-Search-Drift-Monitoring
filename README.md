@@ -1,5 +1,5 @@
 # DocIntel
-### Production RAG with RAGAS Evaluation, Hybrid Search, and Drift Monitoring
+### Production RAG with Hybrid Retrieval, Citation-Grounded Answers, RAGAS Evaluation, and Drift Monitoring
 
 ![Python](https://img.shields.io/badge/Python-3.12-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-Production_API-009688)
@@ -9,281 +9,221 @@
 ![Docker](https://img.shields.io/badge/Docker-Deployment_Ready-2496ED)
 ![MIT License](https://img.shields.io/badge/License-MIT-green)
 
-A production-grade AI system for answering complex regulatory questions over the EU AI Act with cited evidence, measurable quality, hybrid retrieval, automated evaluation, and operational monitoring.
+DocIntel is a production-grade document intelligence system built over the official EU AI Act.
 
-Think of it as an explainable document intelligence platform rather than a PDF chatbot. It ingests a long legal document, indexes it intelligently, retrieves the most relevant evidence using both keyword and semantic search, generates citation-grounded answers, scores answer quality with RAGAS, monitors drift with Evidently, and exposes the entire system through an API plus an operations dashboard.
+At a high level, it answers difficult regulatory questions using a retrieval-augmented generation pipeline that is designed to be explainable, measurable, and operationally trustworthy. Instead of behaving like a generic PDF chatbot, it ingests the full legal document, indexes it intelligently, retrieves evidence with both keyword and semantic search, generates citation-grounded answers, evaluates answer quality with RAGAS, monitors behavior drift over time, and exposes everything through a backend API plus an operations dashboard.
+
+This is the difference between a model demo and an AI system that could actually be taken seriously in a production environment.
 
 * * *
 
 ## Table of Contents
 
-- Short Abstract
-- Deep Introduction
-- The Entire System Explained
-- Core Intelligence Engines
-- Quality Validation
-- Detailed Deployment Guide
-- Development Notes
+- Executive Summary
+- Why This Project Matters
+- System Overview
+- How a Question Turns Into an Answer
+- Why the Retrieval Stack Is Stronger Than Typical RAG
+- How the Platform Proves Quality
+- What This Project Demonstrates
+- Running the Project
+- Technical Appendix
 - References
 
 * * *
 
-## Short Abstract
+## Executive Summary
 
-When people talk about AI over documents, they usually mean a simple workflow:
+Most document AI projects stop at a very simple promise:
 
 1. upload a PDF
 2. ask a question
 3. get an answer
 
-That is fine for a demo, but it is not enough for any serious environment.
+That may be enough for a short demo, but it breaks down quickly when the document is legally dense, operationally important, or high-stakes.
 
-If the document is a regulation, a policy manual, or a legal standard, the user needs far more than a plausible answer. They need to know where the answer came from, whether the retrieval pipeline actually found the right evidence, whether the system is getting better or worse over time, and whether a code change silently damaged quality.
+The EU AI Act is exactly that kind of document. It is long, structured, cross-referenced, terminology-heavy, and easy to misinterpret if retrieval is weak or the language model is left to improvise. In a setting like that, a fluent answer is not enough. The user also needs confidence that:
 
-This repository solves exactly that problem.
+- the right evidence was retrieved
+- the answer is grounded in that evidence
+- the system can be evaluated systematically
+- quality regressions will be visible over time
 
-DocIntel turns the official EU AI Act into a production-shaped retrieval-augmented generation system with five important properties:
+DocIntel was built around those requirements.
 
-- answers are grounded in retrieved evidence
-- every answer is citation-aware
-- retrieval is hybrid, not vector-only
-- quality is measured with RAGAS, not guessed
-- operational behavior is visible through metrics, tracing, drift reports, and a dashboard
-
-In practical terms, this means the system can do far more than answer a question like "What is a high-risk AI system?" It can show the supporting passages, log the full retrieval path, benchmark hybrid retrieval against weaker strategies, evaluate performance on a curated question set, and surface degradation before it turns into user-visible failure.
-
-That is what makes this project a full AI system rather than a thin model wrapper.
+It combines hybrid retrieval, citation-grounded answering, automated evaluation, request tracing, drift monitoring, and a dashboard into one coherent platform. The result is a project that shows not only how to generate answers from documents, but how to build a complete AI product around correctness, visibility, and operational discipline.
 
 * * *
 
-## Deep Introduction
+## Why This Project Matters
 
-### The problem this project solves
+There is a big gap between "an AI feature" and "an AI system someone could trust."
 
-Long-form regulatory text is hard for both humans and machines.
+If a recruiter, engineering manager, or product leader looks at a typical RAG repository, they usually see one narrow capability: a single endpoint that talks to a model and returns text. That might prove familiarity with tools, but it does not prove the ability to engineer a full end-to-end system.
 
-Take the EU AI Act as an example. It is not a short article or a tidy FAQ. It is a long, dense, cross-referenced legal document where meaning depends on exact wording, section structure, annexes, and context. A user might ask:
+This project is deliberately broader.
 
-- What qualifies as a high-risk AI system?
-- Which practices are prohibited?
-- What obligations apply to providers?
-- Where do the annexes change the interpretation of an article?
+DocIntel is designed to show what happens when AI is treated like a real product surface:
 
-Those questions look simple on the surface, but they are difficult to answer well.
+- ingestion is structured, not naive
+- retrieval is hybrid, not one-dimensional
+- answers are cited, not free-floating
+- quality is measured, not guessed
+- drift is monitored, not ignored
+- operators have a dashboard, not just raw logs
 
-The first difficulty is retrieval. If a system only uses vector search, it may miss the exact article the user expects. If it only uses keyword search, it may miss semantically relevant text phrased differently. If it retrieves too much noise, the language model may answer vaguely or anchor on weak evidence.
-
-The second difficulty is trust. In a legal or compliance setting, "the model said so" is not useful. People want the answer and the evidence behind it.
-
-The third difficulty is operations. A RAG system can look good on day one and quietly degrade afterward because of prompt changes, retrieval changes, model changes, or usage drift. Without evaluation and monitoring, teams often discover the problem only after users lose confidence.
-
-DocIntel is built to solve all three problems together:
-
-- better retrieval
-- better answer grounding
-- better operational reliability
-
-### What makes this different from a typical AI repo
-
-Most AI repositories show one narrow capability. This one is different in several structural ways.
-
-1. It is a complete operating system for document intelligence, not just a question-answering endpoint.
-
-The system includes ingestion, indexing, retrieval, generation, citations, evaluation, observability, drift reporting, and a read-only dashboard over the same data plane.
-
-2. It uses hybrid retrieval rather than trusting one retrieval method.
-
-Keyword search, semantic search, reciprocal rank fusion, and reranking each solve a different part of the retrieval problem. The system combines them instead of pretending one strategy is enough.
-
-3. It treats evidence as a first-class output.
-
-The answer pipeline is designed so responses can be traced back to chunks, pages, and section paths. This matters a lot more than people think when the underlying corpus is legal or policy-oriented.
-
-4. It treats quality as something to measure continuously.
-
-The repository includes an evaluation harness with RAGAS metrics so quality can be reasoned about systematically rather than anecdotally.
-
-5. It treats drift and monitoring as product concerns, not extras.
-
-Evidently, LangSmith, structured logging, metrics, and dashboard visibility are part of the system design, not afterthoughts.
-
-### Why the EU AI Act is a strong benchmark
-
-The EU AI Act is a particularly good stress test because:
-
-- it is long enough to challenge naive chunking and retrieval
-- it is structured enough to reward high-quality citations
-- it is legally dense enough to expose hallucinations quickly
-- it contains both exact terminology and broader conceptual language
-
-If a system can handle this type of corpus well, that says something meaningful about its architecture.
+That makes the project relevant not only as a machine learning demo, but also as a backend engineering, applied AI, and production-systems portfolio piece.
 
 * * *
 
-## The Entire System Explained
+## System Overview
 
-### 1. Ingestion and indexing
+The best way to understand DocIntel is to see it as a pipeline with memory, visibility, and feedback loops.
 
-The system begins by ingesting the official EU AI Act PDF and converting it into a structured corpus.
+```mermaid
+flowchart LR
+    A[Official EU AI Act PDF] --> B[Ingestion and Chunking]
+    B --> C[Embeddings and Metadata]
+    C --> D[(PostgreSQL 16 + pgvector)]
 
-This is not handled as one giant blob of text. The ingestion pipeline extracts text page by page, applies structure-aware chunking, preserves document context like page ranges and section paths, and generates dense embeddings for every chunk.
+    U[User Question] --> E[FastAPI Service]
+    E --> F[Hybrid Retrieval]
+    F --> D
+    F --> G[Reciprocal Rank Fusion]
+    G --> H[Cross-Encoder Reranker]
+    H --> I[LLM Answer Generation]
+    I --> J[Citation Extraction]
+    J --> K[Answer with Sources]
 
-The result is a searchable knowledge base where each chunk is:
+    E --> L[RAGAS Evaluation]
+    E --> M[Metrics and Tracing]
+    E --> N[Drift Monitoring]
+    D --> O[Streamlit Ops Dashboard]
+    L --> O
+    M --> O
+    N --> O
+```
 
-- individually addressable
-- semantically searchable
-- keyword searchable
-- traceable back to its source location
+In plain English, the system works like this:
 
-That traceability is what later makes high-quality citations possible.
+- the official EU AI Act is ingested and broken into structured chunks
+- those chunks are stored with both vector representations and searchable metadata
+- every user question goes through a hybrid retrieval process
+- the best evidence is reranked before generation
+- the model answers using retrieved context rather than raw memory
+- citations are extracted so the answer can be traced back to source material
+- evaluation, traces, drift reports, and analytics are all persisted for inspection
 
-### 2. Retrieval
-
-Once the corpus is indexed, retrieval happens in several stages.
-
-First, the system uses BM25 over PostgreSQL full-text search to capture exact lexical relevance. This is useful when the user asks about specific regulatory phrases or article language.
-
-Second, the system uses pgvector for semantic search so conceptually similar text can be found even when the wording does not match perfectly.
-
-Third, it combines those rankings using Reciprocal Rank Fusion. This lets the system benefit from both lexical precision and semantic recall without depending on incompatible score scales.
-
-Fourth, it reranks the strongest candidates with a cross-encoder so the final evidence set is better aligned with the user question.
-
-The practical outcome is a retrieval stack that is much more robust than a single-mode RAG setup.
-
-### 3. Generation and citations
-
-After retrieval, the system prepares a grounded prompt using the retrieved chunks and sends that context to the language model.
-
-But the important detail is what happens next.
-
-The answer is not returned as free-floating text. The generation path is designed around citation markers so the system can map answer statements back to retrieved evidence. That allows the API to return:
-
-- the answer text
-- citation objects
-- source chunk ids
-- document title
-- page start and page end
-- section paths
-
-This means the answer layer is not only about fluency. It is about evidence-backed explanation.
-
-### 4. Evaluation
-
-One of the most valuable parts of the project is that it evaluates itself with a proper harness.
-
-Using a curated evaluation fixture and RAGAS, the system scores answer behavior across dimensions such as:
-
-- faithfulness
-- context precision
-- context recall
-- answer relevancy
-
-This helps answer questions that matter in production:
-
-- Is the answer supported by the retrieved context?
-- Did the retrieval stage bring back too much noise?
-- Did the system miss important information?
-- Does the answer actually address the question asked?
-
-That turns quality into something observable and testable.
-
-### 5. Drift monitoring
-
-A strong AI system should not only work when it is first built. It should also help operators understand whether it is changing over time.
-
-DocIntel includes drift reporting with Evidently so it can track changes in:
-
-- query characteristics
-- embedding behavior
-- retrieval patterns
-- report-level status over time
-
-This gives the system an operational memory. Instead of waiting for complaints, an operator can inspect drift reports and identify degradation trends earlier.
-
-### 6. Operations dashboard
-
-The Streamlit dashboard is the user interface for the people operating the system rather than the people building it.
-
-It includes pages for:
-
-- evaluation trends
-- drift reports
-- cost and latency
-- retrieval exploration
-
-This is important because a production-grade AI system should be inspectable by non-developer stakeholders, not only by whoever can read logs or query the database manually.
+The key idea is that answering a question is only one part of the system. The rest of the platform exists to make that answer explainable, testable, and operationally visible.
 
 * * *
 
-## Core Intelligence Engines
+## How a Question Turns Into an Answer
 
-### Hybrid retrieval engine
+This is the end-to-end lifecycle of a single question moving through the platform.
 
-This is the search heart of the system.
+```mermaid
+sequenceDiagram
+    actor User
+    participant API as FastAPI API
+    participant RET as Retrieval Engine
+    participant DB as Postgres + pgvector
+    participant LLM as OpenRouter Model
+    participant OBS as Metrics and Tracing
 
-It combines:
+    User->>API: Ask a regulatory question
+    API->>RET: Create retrieval request
+    RET->>DB: Run BM25 search
+    RET->>DB: Run vector similarity search
+    RET->>RET: Fuse rankings with RRF
+    RET->>RET: Cross-encoder rerank top candidates
+    RET-->>API: Return best evidence set
+    API->>LLM: Send grounded prompt with retrieved chunks
+    LLM-->>API: Return drafted answer
+    API->>API: Extract citations and map sources
+    API->>OBS: Record latency, tokens, retrieval trace
+    API-->>User: Return answer plus supporting citations
+```
 
-- BM25 for exact language matching
-- pgvector for semantic recall
-- Reciprocal Rank Fusion for robust combination
-- cross-encoder reranking for final precision
+That flow is important because it shows that the language model is not acting alone. It is the final step in a larger evidence pipeline.
 
-This design avoids the usual weakness of vector-only RAG, where semantically similar but legally imprecise passages can outrank the exact article the user actually needs.
-
-### Citation grounding engine
-
-This engine makes the output trustworthy.
-
-Rather than returning only generated text, it extracts and resolves citation references so every answer can be tied back to evidence inside the corpus.
-
-That moves the project away from "model-generated explanation" and toward "traceable document intelligence."
-
-### Evaluation engine
-
-This engine makes quality measurable.
-
-The RAGAS harness allows the repo to score the system on multiple dimensions instead of relying on intuition or spot checks.
-
-That matters because retrieval quality and answer grounding are often the first things to degrade when teams modify prompts, models, or ranking logic.
-
-### Observability engine
-
-This engine makes the system inspectable.
-
-LangSmith traces, Prometheus-style metrics, request IDs, latency tracking, token accounting, and structured logs all make it possible to understand what happened during retrieval and generation.
-
-### Drift engine
-
-This engine makes the system durable over time.
-
-Using Evidently, the platform produces drift reports that help answer a simple but important operational question:
-
-"Is the system still behaving like the system we originally validated?"
-
-### Operations dashboard
-
-This is the human-facing control surface for the intelligence engines above.
-
-It turns raw technical signals into something that a product owner, AI lead, or operator can actually use.
+In weaker systems, the model is often asked to bridge too much uncertainty by itself. In DocIntel, retrieval, reranking, and source mapping do most of the heavy lifting before generation even begins.
 
 * * *
 
-## Quality Validation
+## Why the Retrieval Stack Is Stronger Than Typical RAG
 
-### Verified corpus
+Many RAG systems use one retrieval strategy and hope it is enough. In practice, that is usually where quality starts to fail.
 
-The repository uses the official EU AI Act PDF as its working corpus.
+DocIntel combines four retrieval layers because each one solves a different problem:
 
-Verified corpus snapshot:
+- BM25 helps capture exact legal or regulatory phrasing
+- vector search helps recover semantically related passages
+- Reciprocal Rank Fusion combines both views into one stronger candidate set
+- cross-encoder reranking improves final precision before generation
 
+```mermaid
+flowchart TD
+    Q[User Query] --> B1[BM25 Lexical Search]
+    Q --> B2[Vector Semantic Search]
+    B1 --> C[Candidate Set A]
+    B2 --> D[Candidate Set B]
+    C --> E[Reciprocal Rank Fusion]
+    D --> E
+    E --> F[Top Combined Results]
+    F --> G[Cross-Encoder Reranking]
+    G --> H[Highest-Value Evidence]
+    H --> I[Cited Answer Generation]
+```
+
+This is one of the most important design choices in the repository.
+
+If the system only used vector search, it could miss exact regulatory wording.
+If it only used keyword search, it could miss relevant passages expressed in different language.
+By combining both and then reranking, DocIntel behaves more like a disciplined information system and less like a best-effort chatbot.
+
+* * *
+
+## How the Platform Proves Quality
+
+A production-grade AI system should not just produce answers. It should also create evidence that those answers are worth trusting.
+
+DocIntel does that through evaluation, observability, and drift monitoring.
+
+```mermaid
+flowchart LR
+    A[Live User Queries] --> B[Retrieval and Answer Logs]
+    B --> C[RAGAS Evaluation]
+    B --> D[Metrics and Tracing]
+    B --> E[Evidently Drift Reports]
+    C --> F[Quality Signals]
+    D --> F
+    E --> F
+    F --> G[Streamlit Operations Dashboard]
+    G --> H[Better Debugging and Safer Iteration]
+```
+
+That feedback loop matters for a simple reason:
+
+AI systems often fail gradually.
+
+A retrieval change can reduce context quality.
+A prompt change can reduce faithfulness.
+A model switch can affect consistency.
+Query patterns can shift over time.
+
+Without evaluation and monitoring, none of that becomes visible until user trust is already damaged.
+
+With DocIntel, the platform is built to surface those signals early.
+
+### Verified corpus snapshot
+
+- official EU AI Act PDF
 - 144 pages
 - 331 indexed chunks
 - structure-aware chunking with page and section metadata
 
-### Retrieval benchmark
-
-The retrieval benchmark demonstrates why the hybrid design matters.
+### Retrieval benchmark snapshot
 
 | Strategy | Precision@10 | Recall@10 |
 |---|---:|---:|
@@ -292,37 +232,57 @@ The retrieval benchmark demonstrates why the hybrid design matters.
 | `hybrid` | 0.150 | 0.750 |
 | `hybrid_reranked` | 0.150 | 0.750 |
 
-This is not about claiming perfect retrieval. It is about showing that the system architecture produces materially stronger search behavior than a weaker baseline.
+The point of this table is not to claim perfection. The point is to show that the architecture produces stronger retrieval behavior than a weaker baseline, which is exactly what a serious RAG system should demonstrate.
 
-### Automated quality checks
+### Validation surface
 
 The repository includes:
 
-- linting
-- type checking
 - backend tests
 - dashboard tests
-- container build verification in CI
+- type checking
+- linting
+- container build checks in CI
+- evaluation workflows
+- drift reporting
 
-This matters because production-minded AI systems should be engineered with the same discipline expected from non-AI systems.
-
-### Operational validation
-
-The project also validates:
-
-- metrics exposure
-- retrieval traces
-- drift report generation
-- dashboard rendering
-- containerized builds
-
-So quality here is not only "the model answered." It is "the whole system is behaving coherently."
+So quality here is not just "the model gave an answer." It is "the surrounding system can be measured and inspected."
 
 * * *
 
-## Detailed Deployment Guide
+## What This Project Demonstrates
 
-The system can be run either as a local development stack or as a production-shaped Docker deployment.
+From a portfolio perspective, this repository shows several capabilities at once.
+
+### 1. Applied AI engineering
+
+The project goes beyond model calls and shows how to build a real retrieval-augmented system around evidence, grounding, and measurement.
+
+### 2. Backend and systems design
+
+The FastAPI service, Postgres schema, async persistence layer, migrations, and API contracts are all part of a coherent data-backed platform rather than isolated scripts.
+
+### 3. Search and retrieval engineering
+
+The hybrid retrieval stack demonstrates an understanding that document intelligence quality depends heavily on search architecture, not only on model choice.
+
+### 4. Evaluation discipline
+
+RAGAS-based evaluation turns answer quality into something testable and reviewable, which is a critical production skill in modern AI systems.
+
+### 5. Observability and operations thinking
+
+Metrics, traces, drift reports, and an ops dashboard show that the system was designed to be operated, not merely demonstrated.
+
+### 6. Product-oriented AI implementation
+
+The dashboard and source-grounded answers make the project easier to reason about for non-technical stakeholders, which is often the difference between an interesting prototype and a usable product.
+
+* * *
+
+## Running the Project
+
+The repository can be run as a local development stack or as a production-shaped containerized setup.
 
 ### Prerequisites
 
@@ -339,7 +299,7 @@ The system can be run either as a local development stack or as a production-sha
 Copy-Item .env.example .env
 ```
 
-Key environment values include:
+Important environment values include:
 
 - `DATABASE_URL`
 - `API_KEYS`
@@ -361,8 +321,8 @@ uv run --directory apps/dashboard streamlit run app.py
 
 This gives you:
 
-- FastAPI API surface
-- PostgreSQL plus pgvector
+- FastAPI backend
+- PostgreSQL with pgvector
 - Streamlit operations dashboard
 
 ### Production-shaped deployment
@@ -372,28 +332,18 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml config
 docker compose -f docker-compose.yml -f ops/docker/compose.full.yml up -d
 ```
 
-This repository includes:
+### Core runtime URLs
 
-- base Compose stack
-- production-shaped overlay
-- dashboard overlay
-- API Dockerfile
-- dashboard Dockerfile
-
-### Verification commands
-
-```powershell
-uvx --from ruff==0.15.7 ruff check apps/api/src apps/api/tests apps/dashboard
-uv run --directory apps/api --with mypy==1.18.2 mypy --config-file ../../mypy.ini src
-uv run --directory apps/api pytest tests -v
-uv run --directory apps/dashboard pytest tests/test_db_queries.py -v
-uv run --directory apps/api python -m docintel.tools.benchmark_retrieval --top-k 10
-uv run --directory apps/api python -m docintel.tools.run_drift --window-days 7 --reference-window-days 7
-```
+- API: `http://localhost:8000`
+- API docs: `http://localhost:8000/docs`
+- Dashboard: `http://localhost:8501`
+- Metrics: `http://localhost:8000/metrics`
 
 * * *
 
-## Development Notes
+## Technical Appendix
+
+This section is intentionally pushed toward the end so the README stays understandable to non-developer readers first.
 
 ### Repository structure
 
@@ -445,7 +395,7 @@ ops/docker/                    Compose overlays and pgvector setup
 - Docker
 - GitHub Actions
 
-### What this project is designed to show technically
+### What the project is designed to show technically
 
 - backend API design
 - retrieval system engineering
@@ -482,4 +432,3 @@ MIT
 **Mehul Upase**
 
 - GitHub: [@Mehulupase01](https://github.com/Mehulupase01)
-- Email: `siya.mehul@outlook.com`
