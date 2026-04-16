@@ -21,4 +21,15 @@ artifacts/
 .model_cache/
 data/source/*.pdf
 apps/api/local.db
+apps/api/eval_run.log
+apps/api/key_test_result.txt
+apps/api/tests/.artifacts/
 
+# Internal project execution artifacts not meant for the public repo
+docs/
+CLAUDE.md
+BLUEPRINT.md
+BLUEPRINT.pdf
+CODE_REVIEW.md
+LIVE_VERIFICATION_SUCCESS.md
+VERIFICATION_ATTEMPT.md
