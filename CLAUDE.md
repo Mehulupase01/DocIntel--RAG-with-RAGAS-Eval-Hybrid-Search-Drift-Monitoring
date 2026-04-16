@@ -23,8 +23,7 @@
 - Embeddings: `BAAI/bge-small-en-v1.5` (384-dim); reranker: `cross-encoder/ms-marco-MiniLM-L-6-v2`
 - BM25 via Postgres `tsvector` + GIN; vector via pgvector HNSW (cosine)
 - Fusion: Reciprocal Rank Fusion (`k=60`)
-- LLM: OpenRouter; default generation `minimax/minimax-m2.5:free`, judge `nvidia/nemotron-3-super-120b-a12b:free`
-- Approved verification-only backup pair: generation `anthropic/claude-haiku-4.5`, judge `openai/gpt-4o-mini`
+- LLM: OpenRouter; default generation `minimax/minimax-m2.5:free`, judge `nvidia/nemotron-3-super-120b-a12b:free` (free tier exclusive)
 - Eval: RAGAS faithfulness/context_precision/context_recall/answer_relevancy with CI gate
 - Drift: Evidently weekly job via APScheduler
 

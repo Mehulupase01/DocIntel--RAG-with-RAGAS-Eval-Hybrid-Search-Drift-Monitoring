@@ -3,12 +3,9 @@
 ## Current Status
 - Active phase: Phase 9 - Hardening
 - Local hardening implementation now includes:
-  - default OpenRouter model override for local/runtime settings:
+  - committed OpenRouter model configuration (free tier only):
     - generation: `minimax/minimax-m2.5:free`
     - judge: `nvidia/nemotron-3-super-120b-a12b:free`
-  - approved verification-only backup pair:
-    - generation: `anthropic/claude-haiku-4.5`
-    - judge: `openai/gpt-4o-mini`
   - hardened `apps/api/Dockerfile` and `apps/dashboard/Dockerfile`
   - app-scoped Docker build contexts plus per-app `.dockerignore` files
   - CPU-only `torch==2.6.0+cpu` resolution in `apps/api/uv.lock`
@@ -36,16 +33,14 @@
     - html artifact `apps/api/artifacts/drift/3a1603f0-9ce6-482b-bf0d-4ee829c3c9fb.html`
   - local uvicorn startup on 2026-04-15 logged `docintel.langsmith enabled=True`
   - local `POST /api/v1/search`: `200` on 2026-04-15 against the real EU AI Act corpus
-  - local `POST /api/v1/answer` with requested default generation model `minimax/minimax-m2.5:free`: upstream `429` on 2026-04-15
-  - local `POST /api/v1/answer` with verification model `anthropic/claude-haiku-4.5`: upstream `403 Key limit exceeded` on 2026-04-15
-  - local eval run with tracked default pair persisted errored run `3a5879fe-6be9-40fd-b635-c1ca670b8584` after upstream `429`
-  - local eval run with verification pair persisted errored run `3970c7fd-b631-47a7-9f81-f7973f5fe31f` after upstream `403 Key limit exceeded`
+  - local `POST /api/v1/answer` with default generation model `minimax/minimax-m2.5:free`: upstream `429 Provider returned error` on 2026-04-15 (local OpenRouter key budget exhausted)
+  - local eval run with default pair persisted errored run `3a5879fe-6be9-40fd-b635-c1ca670b8584` after upstream `429`
   - `gh workflow run ci.yml --ref main`: passed on GitHub run `24476974916`, including the Ubuntu API and dashboard Docker image builds
   - `gh workflow run ragas-eval.yml --ref main`: passed in intentional skip mode on GitHub run `24476974864` because repo secrets remain absent by policy
-- Current blockers:
-  - the current local OpenRouter key is over its daily budget, so both the tracked defaults and the verification pair remain blocked from completing a green live answer/eval pass
-  - a fresh API image rebuild (`docker build apps/api` or `docker compose ... up -d --build`) still times out after 60 minutes on this Windows Docker Desktop machine even after the CPU-only torch pin, lazy eval imports, and app-scoped Docker contexts, but that is now non-blocking environment debt because Linux CI is the hard Docker gate
-  - GitHub Actions emits a non-blocking Node 20 deprecation warning for `actions/checkout@v4`, `actions/setup-python@v5`, and `astral-sh/setup-uv@v4`; the workflows are green today but should be bumped to Node 24-compatible action versions in a later maintenance pass
+- Phase 9 completion blockers:
+  - the current local OpenRouter key is over its daily budget; final live `/api/v1/answer` and eval verification require a fresh or restored key
+  - a fresh API image rebuild (`docker build apps/api` or `docker compose ... up -d --build`) still times out after 60 minutes on this Windows Docker Desktop machine, but this is local environment debt and does NOT block production deployment (GitHub Actions Linux CI is the Docker gate)
+  - GitHub Actions emits non-blocking Node 20 deprecation warnings for `actions/checkout@v4`, `actions/setup-python@v5`, and `astral-sh/setup-uv@v4` (should be bumped to Node 24 in a later maintenance pass)
 
 ## Next Step
-- Re-attempt local live `/api/v1/answer` and local eval verification after the OpenRouter daily key limit resets or a fresh local-only key is supplied.
+- Restore or regenerate the local OpenRouter key and re-run live `/api/v1/answer` and eval verification to close Phase 9. All other checks pass; this is the final gate before production deployment.
