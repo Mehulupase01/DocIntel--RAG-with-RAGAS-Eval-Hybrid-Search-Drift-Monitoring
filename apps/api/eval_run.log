@@ -1,0 +1,172 @@
+warning: `VIRTUAL_ENV=C:\Users\Mehul-PC\anaconda3\envs\crewai-enterprise-pipeline` does not match the project environment path `.venv` and will be ignored; use `--active` to target the active environment instead
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\src\docintel\tools\run_eval.py", line 44, in <module>
+    asyncio.run(_main())
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\runners.py", line 195, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\base_events.py", line 691, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\src\docintel\tools\run_eval.py", line 22, in _main
+    result = await run_eval_suite(
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\src\docintel\services\evaluation\ragas_runner.py", line 151, in run_eval_suite
+    run = await _get_or_create_run(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\src\docintel\services\evaluation\ragas_runner.py", line 275, in _get_or_create_run
+    await session.commit()
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\ext\asyncio\session.py", line 1000, in commit
+    await greenlet_spawn(self.sync_session.commit)
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 201, in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\orm\session.py", line 2030, in commit
+    trans.commit(_to_root=True)
+  File "<string>", line 2, in commit
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\orm\session.py", line 1311, in commit
+    self._prepare_impl()
+  File "<string>", line 2, in _prepare_impl
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\orm\session.py", line 1286, in _prepare_impl
+    self.session.flush()
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\orm\session.py", line 4331, in flush
+    self._flush(objects)
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\orm\session.py", line 4466, in _flush
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 121, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\orm\session.py", line 4427, in _flush
+    flush_context.execute()
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\orm\persistence.py", line 68, in save_obj
+    ) in _organize_states_for_save(base_mapper, states, uowtransaction):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\orm\persistence.py", line 223, in _organize_states_for_save
+    for state, dict_, mapper, connection in _connections_for_states(
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\orm\persistence.py", line 1759, in _connections_for_states
+    connection = uowtransaction.transaction.connection(base_mapper)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 2, in connection
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\orm\session.py", line 1037, in connection
+    return self._connection_for_bind(bind, execution_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 2, in _connection_for_bind
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\orm\session.py", line 1173, in _connection_for_bind
+    conn = self._parent._connection_for_bind(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 2, in _connection_for_bind
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\orm\session.py", line 1187, in _connection_for_bind
+    conn = bind.connect()
+           ^^^^^^^^^^^^^^
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 3293, in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 143, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 3317, in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 448, in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 1272, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 712, in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\pool\impl.py", line 177, in _do_get
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 121, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\pool\impl.py", line 175, in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 389, in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 674, in __init__
+    self.__connect()
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 900, in __connect
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 121, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 896, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\engine\create.py", line 667, in connect
+    return dialect.connect(*cargs_tup, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\engine\default.py", line 630, in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 955, in connect
+    await_only(creator_fn(*arg, **kw)),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 132, in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 196, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\asyncpg\connection.py", line 2443, in connect
+    return await connect_utils._connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\asyncpg\connect_utils.py", line 1249, in _connect
+    raise last_error or exceptions.TargetServerAttributeNotMatched(
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\asyncpg\connect_utils.py", line 1218, in _connect
+    conn = await _connect_addr(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\asyncpg\connect_utils.py", line 1054, in _connect_addr
+    return await __connect_addr(params, True, *args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\asyncpg\connect_utils.py", line 1099, in __connect_addr
+    tr, pr = await connector
+             ^^^^^^^^^^^^^^^
+  File "D:\Mehul-Projects\DocIntel- RAG with RAGAS Eval, Hybrid Search & Drift Monitoring\apps\api\.venv\Lib\site-packages\asyncpg\connect_utils.py", line 969, in _create_ssl_connection
+    tr, pr = await loop.create_connection(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\base_events.py", line 1137, in create_connection
+    raise exceptions[0]
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\base_events.py", line 1107, in create_connection
+    sock = await self._connect_sock(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\base_events.py", line 1010, in _connect_sock
+    await self.sock_connect(sock, address)
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\proactor_events.py", line 729, in sock_connect
+    return await self._proactor.connect(sock, address)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\windows_events.py", line 803, in _poll
+    value = callback(transferred, key, ov)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\windows_events.py", line 599, in finish_connect
+    ov.getresult()
+ConnectionRefusedError: [WinError 1225] The remote computer refused the network connection
